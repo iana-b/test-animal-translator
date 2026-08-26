@@ -1,0 +1,461 @@
+{
+  "slug": "honeybee",
+  "name_ru": "Медоносная пчела",
+  "name_en": "Western honey bee",
+  "scientific_name": "Apis mellifera",
+  "engine": "quantitative",
+  "engine_note_ru": "Единственный вид в базе, где перевод — это арифметика, а не взвешивание признаков. Величины на входе непрерывные, на выходе — вектор с интервалом.",
+  "research_maturity_ru": "Механизм описан в 1940-х, независимо подтверждён гармоническим радаром в 2005, количественные калибровки опубликованы в 2016–2021.",
+  "confidence_cap": 0.95,
+  "confidence_cap_derivation": {
+    "kind": "heuristic",
+    "rationale_ru": "Даже при идеальном вводе остаются межподвидовые диалекты и индивидуальные калибровки. Потолок ниже 1.0 отражает, что модель откалибрована на одной колонии одного подвида."
+  },
+  "sources": [
+    {
+      "id": "kohl2021",
+      "authors": "Kohl P.L., Rutschmann B.",
+      "year": 2021,
+      "title": "Honey bees communicate distance via non-linear waggle duration functions",
+      "journal": "PeerJ 9:e11187",
+      "doi": "10.7717/peerj.11187",
+      "url": "https://doi.org/10.7717/peerj.11187",
+      "open_access": "PMC8029670",
+      "licence": "CC BY 4.0",
+      "evidence_grade": "strong",
+      "sample_ru": "56 пчёл, 56 танцев, 1 колония, Apis mellifera carnica, дистанции 0.1–1.7 км, по 4 виляющих пробега на танец",
+      "gives_ru": "Сегментированная модель «длительность ↔ расстояние» и стандартные отклонения длительности"
+    },
+    {
+      "id": "schurch2016",
+      "authors": "Schürch R., Ratnieks F.L.W., Samuelson E.E.W., Couvillon M.J.",
+      "year": 2016,
+      "title": "Dancing to her own beat: honey bee foragers communicate via individually calibrated waggle dances",
+      "journal": "Journal of Experimental Biology 219(9): 1287–1289",
+      "doi": "10.1242/jeb.134874",
+      "url": "https://doi.org/10.1242/jeb.134874",
+      "open_access": null,
+      "licence": "проприетарная (цитируется, не воспроизводится)",
+      "evidence_grade": "strong",
+      "sample_ru": "75 пчёл, 3 колонии, 753 танца, дистанции 200/250/312/350/400 м",
+      "gives_ru": "У каждой пчелы своя калибровка: свой наклон и свой сдвиг. Пробег 0.4 с у одной пчелы означает 210 м, а сородич с другой калибровкой прочтёт его как 310–320 м — расхождение около 50%"
+    },
+    {
+      "id": "okada2014",
+      "authors": "Okada R., Ikeno H., Kimura T., Ohashi M.",
+      "year": 2014,
+      "title": "Error in the honeybee waggle dance improves foraging flexibility",
+      "journal": "Scientific Reports 4: 4175",
+      "doi": "10.1038/srep04175",
+      "url": "https://doi.org/10.1038/srep04175",
+      "open_access": "PMC3935192",
+      "licence": "CC BY-NC-SA 3.0",
+      "evidence_grade": "strong",
+      "sample_ru": "358 виляющих пробегов; 304 из 358 (85%) укладываются в ±15°",
+      "gives_ru": "Угловая погрешность танца: в природе преимущественно 10–15°. Ошибка ≥30° делает танец бесполезным, 15° — оптимальный компромисс между эксплуатацией и разведкой"
+    },
+    {
+      "id": "riley2005",
+      "authors": "Riley J.R., Greggers U., Smith A.D., Reynolds D.R., Menzel R.",
+      "year": 2005,
+      "title": "The flight paths of honeybees recruited by the waggle dance",
+      "journal": "Nature 435: 205–207",
+      "doi": "10.1038/nature03526",
+      "url": "https://doi.org/10.1038/nature03526",
+      "open_access": null,
+      "licence": "проприетарная (цитируется, не воспроизводится)",
+      "evidence_grade": "strong",
+      "sample_ru": "Гармонический радар, слежение за траекториями завербованных пчёл",
+      "gives_ru": "Прямое подтверждение, что завербованные пчёлы летят именно по закодированному в танце вектору, а не ищут по запаху"
+    },
+    {
+      "id": "vonfrisch1967",
+      "authors": "von Frisch K.",
+      "year": 1967,
+      "title": "The Dance Language and Orientation of Bees",
+      "journal": "Harvard University Press",
+      "doi": null,
+      "url": "https://openlibrary.org/books/OL34849895M/Dance_Language_and_Orientation_of_Bees",
+      "open_access": null,
+      "licence": "проприетарная (цитируется, не воспроизводится)",
+      "evidence_grade": "strong",
+      "sample_ru": "Монография, обобщающая десятилетия экспериментов; Нобелевская премия 1973",
+      "gives_ru": "Базовое правило направления: угол виляющего пробега от вертикали равен углу цели относительно азимута солнца. Круговой танец — ближний ресурс без направления",
+      "isbn": "9780674418776",
+      "publisher_page": "https://www.hup.harvard.edu/books/9780674418776"
+    },
+    {
+      "id": "seeley1992",
+      "authors": "Seeley T.D.",
+      "year": 1992,
+      "title": "The tremble dance of the honey bee: message and meanings",
+      "journal": "Behavioral Ecology and Sociobiology 31: 375–383",
+      "doi": "10.1007/BF00170604",
+      "url": "https://doi.org/10.1007/BF00170604",
+      "open_access": null,
+      "licence": "проприетарная (цитируется, не воспроизводится)",
+      "evidence_grade": "strong",
+      "sample_ru": "Экспериментальные манипуляции с загрузкой приёмщиц нектара",
+      "gives_ru": "Дрожащий танец — сообщение не о ресурсе, а о нехватке приёмщиц нектара в улье. Вектора не несёт"
+    },
+    {
+      "id": "nieh2010",
+      "authors": "Nieh J.C.",
+      "year": 2010,
+      "title": "A negative feedback signal that is triggered by peril curbs honey bee recruitment",
+      "journal": "Current Biology 20(4): 310–315",
+      "doi": "10.1016/j.cub.2009.12.060",
+      "url": "https://doi.org/10.1016/j.cub.2009.12.060",
+      "open_access": null,
+      "licence": "проприетарная (цитируется, не воспроизводится)",
+      "evidence_grade": "strong",
+      "sample_ru": "Эксперименты с имитацией опасности на кормушке",
+      "gives_ru": "Стоп-сигнал — тормозящий сигнал, подавляющий вербовку. Связан с опасностью на источнике, а не с его качеством"
+    },
+    {
+      "id": "dong2023",
+      "authors": "Dong S., Lin T., Nieh J.C., Tan K.",
+      "year": 2023,
+      "title": "Social signal learning of the waggle dance in honey bees",
+      "journal": "Science 379(6636): 1015–1018",
+      "doi": "10.1126/science.ade1702",
+      "url": "https://doi.org/10.1126/science.ade1702",
+      "open_access": "авторская копия: https://labs.biology.ucsd.edu/nieh/papers/DongScience.pdf",
+      "licence": "проприетарная (цитируется, не воспроизводится)",
+      "evidence_grade": "strong",
+      "sample_ru": "Колонии, выращенные без пчёл-наставниц",
+      "gives_ru": "Пчёлы, не имевшие возможности следовать за чужими танцами до своего первого танца, танцевали более беспорядочно: у них была больше угловая ошибка и они неверно кодировали расстояние. Угловая ошибка с опытом выправлялась, а ошибка в кодировании расстояния оставалась с пчелой на всю жизнь."
+    },
+    {
+      "id": "seeley1999",
+      "authors": "Seeley T.D., Buhrman S.C.",
+      "year": 1999,
+      "title": "Group decision making in swarms of honey bees",
+      "journal": "Behavioral Ecology and Sociobiology 45: 19–31",
+      "doi": "10.1007/s002650050536",
+      "url": "https://doi.org/10.1007/s002650050536",
+      "open_access": null,
+      "licence": "проприетарная (цитируется, не воспроизводится)",
+      "evidence_grade": "strong",
+      "sample_ru": "Наблюдение за роями, выбирающими новое место гнезда",
+      "gives_ru": "На поверхности роя тот же виляющий танец рекламирует не корм, а кандидатное место для гнезда — механизм один, предмет сообщения другой"
+    },
+    {
+      "id": "gardner2008",
+      "authors": "Gardner K.E., Seeley T.D., Calderone N.W.",
+      "year": 2008,
+      "title": "Do honeybees have two discrete dances to advertise food sources?",
+      "journal": "Animal Behaviour 75: 1291–1300",
+      "doi": "10.1016/j.anbehav.2007.09.032",
+      "url": "https://doi.org/10.1016/j.anbehav.2007.09.032",
+      "open_access": null,
+      "licence": "проприетарная (цитируется, не воспроизводится)",
+      "evidence_grade": "strong",
+      "sample_ru": "Сравнение формы танцев на разных дистанциях",
+      "gives_ru": "Круговой и виляющий танцы — не два разных сигнала, а концы одного континуума: один регулируемый сигнал вербовки"
+    },
+    {
+      "id": "griffin2012",
+      "authors": "Griffin S.R., Smith M.L., Seeley T.D.",
+      "year": 2012,
+      "title": "Do honeybees use the directional information in round dances to find nearby food sources?",
+      "journal": "Animal Behaviour 83: 1319–1324",
+      "doi": "10.1016/j.anbehav.2012.03.003",
+      "url": "https://doi.org/10.1016/j.anbehav.2012.03.003",
+      "open_access": null,
+      "licence": "проприетарная (цитируется, не воспроизводится)",
+      "evidence_grade": "strong",
+      "sample_ru": "Две кормушки с сиропом разной концентрации ближе 100 м от улья",
+      "gives_ru": "Завербованные пчёлы действительно пользуются направлением из кругового танца и находят нужную кормушку. Классическое представление, что направления там нет, опровергнуто"
+    }
+  ],
+  "quantitative_model": {
+    "distance": {
+      "description_ru": "Сегментированная линейная регрессия длительности виляющей фазы по расстоянию. В приложении уравнения обращаются: мы знаем длительность, ищем расстояние.",
+      "forward_equations": [
+        {
+          "applies_when_km": "d <= 1.0328",
+          "intercept_s": 0.2917,
+          "slope_s_per_km": 1.4282
+        },
+        {
+          "applies_when_km": "d > 1.0328",
+          "intercept_s": 1.0767,
+          "slope_s_per_km": 0.6683
+        }
+      ],
+      "breakpoint_km": 1.0328,
+      "breakpoint_duration_s": 1.7667,
+      "calibrated_range_km": [
+        0.1,
+        1.7
+      ],
+      "calibrated_range_duration_s": [
+        0.41,
+        2.2
+      ],
+      "r_squared": 0.947,
+      "subspecies": "Apis mellifera carnica",
+      "source_id": "kohl2021",
+      "derivation": {
+        "kind": "source",
+        "where_ru": "Kohl & Rutschmann 2021, сегментированная регрессия, точка перелома 1.0328 км"
+      },
+      "sd_model": {
+        "description_ru": "Стандартное отклонение длительности виляющей фазы растёт с расстоянием. Берём две опубликованные точки и линейно интерполируем между ними.",
+        "sd_at_100m_s": 0.1,
+        "sd_at_1700m_s": 0.19,
+        "source_id": "kohl2021",
+        "derivation": {
+          "kind": "source",
+          "where_ru": "Kohl & Rutschmann 2021: 0.41 ± 0.10 с на 100 м и 2.20 ± 0.19 с на 1.7 км"
+        },
+        "interpolation": {
+          "kind": "heuristic",
+          "rationale_ru": "Линейная интерполяция SD между двумя опубликованными точками. Сама форма зависимости SD от расстояния в статье не приводится."
+        }
+      },
+      "individual_calibration_risk": {
+        "systematic_bias_fraction": 0.5,
+        "source_id": "schurch2016",
+        "derivation": {
+          "kind": "source",
+          "where_ru": "Schürch et al. 2016: 210 м против 310–320 м на одинаковом пробеге 0.4 с — расхождение около 50%"
+        },
+        "note_ru": "Это систематическое смещение, а не случайный разброс. Складывать его со статистическим интервалом нельзя — они показываются раздельно."
+      }
+    },
+    "direction": {
+      "rule_ru": "Угол виляющего пробега, отсчитанный от вертикали вверх по часовой стрелке, равен углу цели относительно азимута солнца.",
+      "source_id": "vonfrisch1967",
+      "angular_error_deg": 15,
+      "angular_error_coverage": 0.85,
+      "angular_error_source_id": "okada2014",
+      "derivation": {
+        "kind": "source",
+        "where_ru": "Okada et al. 2014: 304 из 358 пробегов (85%) укладываются в ±15°"
+      },
+      "surface_note_ru": "Правило пересчёта работает только на вертикальном соте, где опорой служит гравитация. На горизонтальной поверхности под открытым небом пчела направляет пробег прямо на цель, и угол от вертикали теряет смысл.",
+      "surface_note_source_id": "vonfrisch1967"
+    }
+  },
+  "confidence_model": {
+    "formula_ru": "confidence = r_squared × protocol_factor × range_factor × calibration_factor, ограничено потолком вида",
+    "factors": {
+      "r_squared": {
+        "value": 0.947,
+        "derivation": {
+          "kind": "source",
+          "source_id": "kohl2021",
+          "where_ru": "качество подгонки сегментированной модели"
+        }
+      },
+      "protocol_factor": {
+        "values": {
+          "runs_ge_4": 1.0,
+          "runs_2_or_3": 0.9,
+          "runs_1": 0.8
+        },
+        "derivation": {
+          "kind": "heuristic",
+          "rationale_ru": "Калибровка получена усреднением по 4 пробегам на танец. Меньшее число пробегов — отклонение от протокола источника. Конкретные множители в статье не приводятся."
+        }
+      },
+      "range_factor": {
+        "values": {
+          "within_calibrated_range": 1.0,
+          "extrapolated": 0.75
+        },
+        "derivation": {
+          "kind": "heuristic",
+          "rationale_ru": "За пределами 0.41–2.20 с модель не проверялась. Штраф отражает экстраполяцию, его величина не измерена."
+        }
+      },
+      "calibration_factor": {
+        "values": {
+          "individual_calibration_known": 1.0,
+          "unknown": 0.75
+        },
+        "derivation": {
+          "kind": "heuristic",
+          "rationale_ru": "Опирается на факт из Schürch et al. 2016 о ~50% систематическом расхождении, но сам множитель — инженерная оценка."
+        }
+      },
+      "direction_confidence": {
+        "value": 0.85,
+        "derivation": {
+          "kind": "source",
+          "source_id": "okada2014",
+          "where_ru": "доля пробегов, укладывающихся в объявленный коридор ±15°"
+        }
+      }
+    }
+  },
+  "input_schema": [
+    {
+      "id": "dance_type",
+      "label_ru": "Тип танца",
+      "type": "choice",
+      "options": [
+        {
+          "value": "waggle",
+          "label_ru": "Виляющий (восьмёрка с прямым пробегом)"
+        },
+        {
+          "value": "round",
+          "label_ru": "Круговой"
+        },
+        {
+          "value": "tremble",
+          "label_ru": "Дрожащий"
+        },
+        {
+          "value": "stop_signal",
+          "label_ru": "Стоп-сигнал (короткий вибрационный толчок)"
+        }
+      ],
+      "required": true
+    },
+    {
+      "id": "waggle_run_duration_s",
+      "label_ru": "Длительность виляющей фазы, с",
+      "type": "number",
+      "hint_ru": "Среднее по пробегам одного танца. Калибровка охватывает 0.41–2.20 с."
+    },
+    {
+      "id": "n_waggle_runs_measured",
+      "label_ru": "Сколько пробегов измерено",
+      "type": "integer",
+      "hint_ru": "Протокол источника — 4 пробега на танец."
+    },
+    {
+      "id": "angle_from_vertical_deg",
+      "label_ru": "Угол пробега от вертикали, °",
+      "type": "number",
+      "hint_ru": "По часовой стрелке от направления «вверх» на вертикальном соте."
+    },
+    {
+      "id": "sun_azimuth_deg",
+      "label_ru": "Азимут солнца, °",
+      "type": "number",
+      "hint_ru": "Без него направление считается только относительно солнца, не в компасных градусах."
+    },
+    {
+      "id": "dance_surface",
+      "label_ru": "Поверхность танца",
+      "type": "choice",
+      "options": [
+        {
+          "value": "vertical_comb",
+          "label_ru": "Вертикальный сот в темноте улья"
+        },
+        {
+          "value": "swarm_surface",
+          "label_ru": "Поверхность роя"
+        },
+        {
+          "value": "horizontal",
+          "label_ru": "Горизонтальная поверхность под открытым небом"
+        }
+      ]
+    },
+    {
+      "id": "individual_calibration_known",
+      "label_ru": "Известна ли калибровка этой конкретной пчелы",
+      "type": "boolean"
+    }
+  ],
+  "rules": [
+    {
+      "id": "waggle_resource_vector",
+      "dance_type": "waggle",
+      "translation_ru": "«Корм там»: направление и расстояние до ресурса закодированы в пробеге.",
+      "detail_ru": "Виляющий танец вербует сборщиц на конкретную точку. Завербованные пчёлы летят именно по этому вектору — подтверждено слежением гармоническим радаром.",
+      "source_ids": [
+        "vonfrisch1967",
+        "kohl2021",
+        "riley2005",
+        "seeley1999"
+      ],
+      "alternatives_ru": [
+        "Танец на поверхности роя рекламирует не корм, а место для нового гнезда — тот же механизм, другое содержание",
+        "Источник воды или смолы вместо нектара: вектор тот же, предмет сообщения не различается по самому танцу"
+      ]
+    },
+    {
+      "id": "round_near_resource",
+      "dance_type": "round",
+      "translation_ru": "«Корм совсем рядом с ульем», ближе примерно 100 м.",
+      "detail_ru": "На малых расстояниях виляющая фаза становится очень короткой и восьмёрка деформируется в круг. Направление в таком танце всё же присутствует, и завербованные пчёлы им пользуются, но настолько коротким пробегом, что опубликованная модель расстояния его не покрывает — она откалибрована от 100 м.",
+      "source_ids": [
+        "vonfrisch1967",
+        "gardner2008",
+        "griffin2012"
+      ],
+      "alternatives_ru": [
+        "Переходная форма танца: ресурс на границе, где круг вытягивается в восьмёрку"
+      ]
+    },
+    {
+      "id": "tremble_receiver_shortage",
+      "dance_type": "tremble",
+      "translation_ru": "«Некому принимать нектар»: в улье не хватает пчёл-приёмщиц.",
+      "detail_ru": "Сообщение адресовано улью, а не сборщицам, и не содержит вектора. Частая ошибка — читать его как танец о ресурсе.",
+      "source_ids": [
+        "seeley1992"
+      ],
+      "alternatives_ru": []
+    },
+    {
+      "id": "stop_signal_danger",
+      "dance_type": "stop_signal",
+      "translation_ru": "«Прекрати вербовать»: тормозящий сигнал, связанный с опасностью на источнике.",
+      "detail_ru": "Отрицательная обратная связь: подавляет вербовку на место, где танцовщица столкнулась с угрозой.",
+      "source_ids": [
+        "nieh2010"
+      ],
+      "alternatives_ru": [
+        "Перегрузка источника: сигнал подавляет вербовку и при чрезмерной толкучке на кормушке"
+      ]
+    }
+  ],
+  "myths": [
+    {
+      "claim_ru": "Танец пчелы указывает точную точку, как GPS.",
+      "reality_ru": "В природе угловая погрешность 10–15°, и она, по-видимому, полезна: она рассеивает сборщиц вокруг цели. Ошибка ≥30° делает танец бесполезным.",
+      "source_ids": [
+        "okada2014"
+      ]
+    },
+    {
+      "claim_ru": "Одна и та же длительность пробега у любой пчелы означает одно и то же расстояние.",
+      "reality_ru": "У каждой пчелы своя калибровка. Пробег 0.4 с может означать 210 м у одной особи и читаться как 310–320 м другой — расхождение около 50%.",
+      "source_ids": [
+        "schurch2016"
+      ]
+    },
+    {
+      "claim_ru": "Умение танцевать врождённое и одинаковое у всех пчёл.",
+      "reality_ru": "Танцу учатся, следуя за чужими танцами. У пчёл, выросших без наставниц, угловая ошибка со временем выправляется, а неверное кодирование расстояния закрепляется на всю жизнь.",
+      "source_ids": [
+        "dong2023"
+      ]
+    },
+    {
+      "claim_ru": "Любой танец в улье сообщает о корме.",
+      "reality_ru": "Дрожащий танец сообщает о нехватке приёмщиц нектара, а стоп-сигнал подавляет вербовку. Вектора в них нет вообще.",
+      "source_ids": [
+        "seeley1992",
+        "nieh2010"
+      ]
+    },
+    {
+      "claim_ru": "Круговой танец сообщает только «корм рядом» и направления не несёт.",
+      "reality_ru": "Так считалось классически, но эксперименты показали обратное: завербованные пчёлы пользуются направлением из кругового танца и находят нужную кормушку. Круговой и виляющий танцы — концы одного континуума, а не два разных сигнала.",
+      "source_ids": [
+        "gardner2008",
+        "griffin2012"
+      ]
+    }
+  ]
+}
