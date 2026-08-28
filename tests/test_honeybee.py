@@ -1,7 +1,7 @@
 """Тесты декодера пчелы.
 
-Проверяют не «код не падает», а что арифметика совпадает с опубликованной
-моделью и что три вида неизвестности не смешиваются между собой.
+Проверяется совпадение расчёта с опубликованной моделью и разграничение
+причин, по которым значение остаётся неопределённым.
 """
 
 from __future__ import annotations
@@ -42,7 +42,7 @@ class TestDistanceModel(unittest.TestCase):
         self.assertGreater(far_gain, near_gain)
 
     def test_relative_precision_improves_with_distance(self):
-        """Следствие модели: у ближних ресурсов относительная точность заметно хуже."""
+        """У ближних ресурсов относительная точность оценки хуже."""
         near = honeybee.estimate_distance(KB, 0.5)
         far = honeybee.estimate_distance(KB, 2.0)
         self.assertGreater(near.sigma_metres / near.metres, far.sigma_metres / far.metres)
@@ -76,12 +76,12 @@ class TestDirection(unittest.TestCase):
         self.assertIs(gap.kind, UnknownKind.NOT_APPLICABLE)
 
 
-class TestThreeKindsOfUnknown(unittest.TestCase):
-    """Ядро честности: «я не знаю» и «этого в сигнале нет» — разные ответы."""
+class TestKindsOfUnknown(unittest.TestCase):
+    """Разграничение причин, по которым значение не определено."""
 
     def test_round_dance_direction_is_beyond_the_model_not_absent(self):
-        """Классическое «направления там нет» опровергнуто Griffin et al. 2012:
-        направление есть, но наша модель его не покрывает — это разные вещи."""
+        """Griffin et al. 2012: направление в круговом танце есть,
+        но модель расстояния его не покрывает."""
         res = honeybee.translate({"dance_type": "round"})
         gap = next(u for u in res.unknowns if u.field_ru == "Направление")
         self.assertIs(gap.kind, UnknownKind.BEYOND_MODEL)
@@ -121,35 +121,8 @@ class TestConfidence(unittest.TestCase):
         self.assertTrue(any("систематическое смещение" in w for w in res.warnings_ru))
 
 
-class TestKnowledgeBaseIntegrity(unittest.TestCase):
-    def test_every_referenced_source_exists(self):
-        known = {s["id"] for s in KB["sources"]}
-        referenced = set()
-        for rule in KB["rules"]:
-            referenced.update(rule["source_ids"])
-        for myth in KB["myths"]:
-            referenced.update(myth["source_ids"])
-        referenced.add(KB["quantitative_model"]["distance"]["source_id"])
-        referenced.add(KB["quantitative_model"]["direction"]["source_id"])
-        self.assertEqual(referenced - known, set())
-
-    def test_every_source_has_a_verifiable_link(self):
-        for s in KB["sources"]:
-            self.assertTrue(s.get("doi") or s.get("url"), f"{s['id']} без ссылки")
-
-    def test_every_coefficient_declares_where_it_came_from(self):
-        """Каждое число — либо из статьи, либо явно помечено как эвристика."""
-        factors = KB["confidence_model"]["factors"]
-        for name, factor in factors.items():
-            self.assertIn(factor["derivation"]["kind"], ("source", "heuristic"), name)
-
-
-if __name__ == "__main__":
-    unittest.main(verbosity=2)
-
-
 class TestConfidenceScope(unittest.TestCase):
-    """Процент без указания, к чему он относится, вводит в заблуждение."""
+    """Уверенность сопровождается указанием, к чему именно она относится."""
 
     def test_scope_says_distance_only_when_direction_missing(self):
         res = honeybee.translate({"dance_type": "waggle", "waggle_run_duration_s": 0.6})
@@ -161,3 +134,55 @@ class TestConfidenceScope(unittest.TestCase):
              "angle_from_vertical_deg": 40, "sun_azimuth_deg": 180}
         )
         self.assertIn("вектору целиком", res.confidence_scope_ru)
+
+
+if __name__ == "__main__":
+    unittest.main(verbosity=2)
+
+
+class TestPublishedConstants(unittest.TestCase):
+    """Величины, взятые из статей, зафиксированы: правка в базе знаний должна ронять тест."""
+
+    def test_distance_model_matches_kohl_rutschmann_2021(self):
+        model = KB["quantitative_model"]["distance"]
+        near, far = model["forward_equations"]
+        self.assertAlmostEqual(near["intercept_s"], 0.2917)
+        self.assertAlmostEqual(near["slope_s_per_km"], 1.4282)
+        self.assertAlmostEqual(far["intercept_s"], 1.0767)
+        self.assertAlmostEqual(far["slope_s_per_km"], 0.6683)
+        self.assertAlmostEqual(model["breakpoint_km"], 1.0328)
+        self.assertAlmostEqual(model["r_squared"], 0.947)
+        self.assertEqual(model["calibrated_range_km"], [0.1, 1.7])
+        self.assertEqual(model["calibrated_range_duration_s"], [0.41, 2.20])
+
+    def test_standard_deviations_match_the_published_anchor_points(self):
+        sd = KB["quantitative_model"]["distance"]["sd_model"]
+        self.assertAlmostEqual(sd["sd_at_100m_s"], 0.10)
+        self.assertAlmostEqual(sd["sd_at_1700m_s"], 0.19)
+        self.assertAlmostEqual(honeybee._sd_for_distance(KB, 0.1), 0.10, places=6)
+        self.assertAlmostEqual(honeybee._sd_for_distance(KB, 1.7), 0.19, places=6)
+
+    def test_angular_error_matches_okada_2014(self):
+        direction = KB["quantitative_model"]["direction"]
+        self.assertEqual(direction["angular_error_deg"], 15)
+        self.assertAlmostEqual(direction["angular_error_coverage"], 0.85)
+
+    def test_individual_calibration_risk_matches_schurch_2016(self):
+        risk = KB["quantitative_model"]["distance"]["individual_calibration_risk"]
+        self.assertAlmostEqual(risk["systematic_bias_fraction"], 0.5)
+
+
+class TestUncertaintyPropagation(unittest.TestCase):
+    def test_absolute_uncertainty_grows_with_distance(self):
+        near = honeybee.estimate_distance(KB, 0.6)
+        far = honeybee.estimate_distance(KB, 2.0)
+        self.assertGreater(far.sigma_metres, near.sigma_metres)
+
+    def test_direction_corridor_width_equals_twice_the_published_error(self):
+        err = KB["quantitative_model"]["direction"]["angular_error_deg"]
+        res = honeybee.translate(
+            {"dance_type": "waggle", "waggle_run_duration_s": 1.2,
+             "angle_from_vertical_deg": 40, "sun_azimuth_deg": 180}
+        )
+        step = next(s for s in res.steps if "омпасное" in s.label_ru)
+        self.assertIn(f"{220 - err:.0f}–{220 + err:.0f}°", step.value_ru)

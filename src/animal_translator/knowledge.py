@@ -17,6 +17,3 @@ def load_species(slug: str) -> dict[str, Any]:
         raise FileNotFoundError(f"Нет базы знаний для вида {slug!r}: ожидался {path}")
     return json.loads(path.read_text(encoding="utf-8"))
 
-
-def sources_by_id(species: dict[str, Any]) -> dict[str, dict[str, Any]]:
-    return {s["id"]: s for s in species["sources"]}
