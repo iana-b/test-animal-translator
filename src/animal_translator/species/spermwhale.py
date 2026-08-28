@@ -103,17 +103,26 @@ def translate(observation: dict[str, Any]) -> Result:
     # Эхолокация: функция сигнала известна, и это единственный случай у вида,
     # где ответ содержателен.
     if signal["has_meaning"]:
+        steps = [Step(label_ru=signal["label_ru"], value_ru=signal["meaning_kind_ru"],
+                      source_ids=signal["source_ids"])]
+        for fact in signal.get("supporting_facts_ru", []):
+            steps.append(Step(label_ru="Измерено", value_ru=fact,
+                              source_ids=[signal["measured_quantity"]["source_id"]]))
+
+        measured = signal.get("measured_quantity")
         return Result(
             species=SLUG,
             verdict=Verdict.TRANSLATED,
             headline_ru=signal["behaviour_ru"],
-            confidence=None,
+            confidence=measured["value"] if measured else None,
             confidence_level_ru="функция установлена измерениями",
-            steps=[Step(label_ru=signal["label_ru"], value_ru=signal["meaning_kind_ru"], source_ids=signal["source_ids"])],
+            confidence_scope_ru=measured["label_ru"] if measured else None,
+            steps=steps,
             unknowns=[],
             warnings_ru=[
                 "Это функция сигнала, а не содержание сообщения: щелчок направлен на добычу и среду, "
-                "а не на сородича."
+                "а не на сородича.",
+                measured["scope_ru"] if measured else "",
             ],
             source_ids=signal["source_ids"],
         )

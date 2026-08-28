@@ -48,7 +48,9 @@ SHOTS = [
                  "&inter_click_intervals_s=0.12,0.12,0.35,0.12&extra_final_click=yes"
                  "&exchange_durations_s=0.71,0.74,0.78,0.80", 1280, 1250,
      "Кашалот: структура разобрана, значения не существует"),
-    ("08-knowledge", "/species/elephant/kb", 1280, 1500,
+    ("08-whale-clicks", "/species/spermwhale?signal_type=usual_clicks", 1280, 1050,
+     "Кашалот: единственный сигнал, у которого функция установлена измерениями"),
+    ("09-knowledge", "/species/elephant/kb", 1280, 1500,
      "База знаний: источники, доступ, лицензии, поправки"),
 ]
 
@@ -80,6 +82,9 @@ def main() -> None:
     chrome = find_chrome()
     port = free_port()
     OUT.mkdir(parents=True, exist_ok=True)
+
+    for stale in OUT.glob("*.png"):
+        stale.unlink()
 
     server = subprocess.Popen([sys.executable, str(ROOT / "run.py"), str(port)],
                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
