@@ -42,7 +42,10 @@
       "journal": "PLoS ONE 5: e10346",
       "doi": "10.1371/journal.pone.0010346",
       "url": "https://doi.org/10.1371/journal.pone.0010346",
-      "open_access": "PLoS ONE, полный текст открыт",
+      "open_access": {
+        "kind": "publisher",
+        "note_ru": "PLoS ONE, полный текст открыт"
+      },
       "licence": "CC BY",
       "evidence_grade": "strong",
       "sample_ru": "15 проигрываний звука потревоженных пчёл и 13 контрольных с белым шумом; отдельно по 10 проигрываний трёх типов рёва",
@@ -56,7 +59,10 @@
       "journal": "PLoS ONE 9: e89403",
       "doi": "10.1371/journal.pone.0089403",
       "url": "https://doi.org/10.1371/journal.pone.0089403",
-      "open_access": "PLoS ONE, полный текст открыт",
+      "open_access": {
+        "kind": "publisher",
+        "note_ru": "PLoS ONE, полный текст открыт"
+      },
       "licence": "CC BY",
       "evidence_grade": "strong",
       "sample_ru": "Проигрывание голосов самбуру 14 семьям, звука пчёл 15 семьям, белого шума 13 семьям; проигрывание самих рёвов — по 10 семей на тип",
@@ -320,6 +326,98 @@
         "poole1988",
         "poole1999"
       ]
+    }
+  ],
+  "input_schema": [
+    {
+      "id": "perceived",
+      "label_ru": "Как воспринят сигнал",
+      "type": "choice",
+      "required": true,
+      "options": [
+        {
+          "value": "heard",
+          "label_ru": "Услышан"
+        },
+        {
+          "value": "felt_vibration",
+          "label_ru": "Ощущён как вибрация"
+        },
+        {
+          "value": "not_perceived",
+          "label_ru": "Не воспринят"
+        }
+      ]
+    },
+    {
+      "id": "f0_hz",
+      "label_ru": "Основная частота, Гц",
+      "type": "number",
+      "hint_ru": "Измеренная по записи. Диапазон рёва 14–35 Гц, слух человека начинается примерно с 20 Гц.",
+      "example_ru": "например, 18"
+    },
+    {
+      "id": "headshaking",
+      "label_ru": "Была тряска головой",
+      "type": "boolean",
+      "hint_ru": "Единственный поведенческий признак, отделяющий пчелиную тревогу от человеческой."
+    },
+    {
+      "id": "threat_present",
+      "label_ru": "Что рядом",
+      "type": "choice",
+      "options": [
+        {
+          "value": "bees",
+          "label_ru": "Пчёлы"
+        },
+        {
+          "value": "humans",
+          "label_ru": "Люди"
+        },
+        {
+          "value": "none",
+          "label_ru": "Ничего"
+        }
+      ]
+    },
+    {
+      "id": "group_response",
+      "label_ru": "Реакция группы",
+      "type": "choice",
+      "options": [
+        {
+          "value": "retreat",
+          "label_ru": "Отход"
+        },
+        {
+          "value": "coordinated_departure",
+          "label_ru": "Согласованное начало движения"
+        },
+        {
+          "value": "vocal_reply",
+          "label_ru": "Ответный зов"
+        },
+        {
+          "value": "no_change",
+          "label_ru": "Без изменений"
+        }
+      ]
+    },
+    {
+      "id": "separation",
+      "label_ru": "Особь отделена от группы",
+      "type": "boolean"
+    },
+    {
+      "id": "reunion",
+      "label_ru": "Встреча после разлуки",
+      "type": "boolean"
+    },
+    {
+      "id": "single_addressee_responded",
+      "label_ru": "Ответила одна особь, остальные нет",
+      "type": "boolean"
     }
   ]
 }

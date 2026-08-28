@@ -15,7 +15,10 @@
       "journal": "Nature Communications 15: 3617",
       "doi": "10.1038/s41467-024-47221-8",
       "url": "https://doi.org/10.1038/s41467-024-47221-8",
-      "open_access": "PMC11076547, полный текст открыт",
+      "open_access": {
+        "kind": "pmc",
+        "id": "PMC11076547"
+      },
       "licence": "CC BY 4.0",
       "evidence_grade": "strong",
       "sample_ru": "8719 код клана EC-1, не менее 60 разных китов; 42 установки регистраторов на 25 особей из 11 социальных групп; 2005–2018 годы, побережье Доминики, около 2000 км²",
@@ -72,7 +75,10 @@
       "journal": "Scientific Reports 15",
       "doi": "10.1038/s41598-025-97009-z",
       "url": "https://doi.org/10.1038/s41598-025-97009-z",
-      "open_access": "Scientific Reports, полный текст открыт",
+      "open_access": {
+        "kind": "publisher",
+        "note_ru": "Scientific Reports, полный текст открыт"
+      },
       "licence": "CC BY",
       "evidence_grade": "moderate",
       "sample_ru": "Автоматическое выделение и разметка код в записях восточно-карибских кашалотов",
@@ -195,6 +201,44 @@
       "source_ids": [
         "miller2004"
       ]
+    }
+  ],
+  "input_schema": [
+    {
+      "id": "signal_type",
+      "label_ru": "Тип сигнала",
+      "type": "choice",
+      "required": true,
+      "options": [
+        {
+          "value": "coda",
+          "label_ru": "Кода"
+        },
+        {
+          "value": "usual_clicks",
+          "label_ru": "Обычные щелчки"
+        }
+      ]
+    },
+    {
+      "id": "inter_click_intervals_s",
+      "label_ru": "Межщелчковые интервалы, с",
+      "type": "numbers",
+      "hint_ru": "Из них считаются ритм и темп: рисунок интервалов и общая длительность.",
+      "example_ru": "например, 0.12, 0.12, 0.35, 0.12"
+    },
+    {
+      "id": "extra_final_click",
+      "label_ru": "Дополнительный щелчок в конце",
+      "type": "boolean",
+      "hint_ru": "Орнаментация: встречается примерно в 4% обменов."
+    },
+    {
+      "id": "exchange_durations_s",
+      "label_ru": "Длительности код в обмене, с",
+      "type": "numbers",
+      "hint_ru": "Рубато измеряется только по обмену: по одной коде оно не определено.",
+      "example_ru": "например, 0.71, 0.74, 0.78, 0.80"
     }
   ]
 }

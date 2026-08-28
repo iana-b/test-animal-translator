@@ -15,7 +15,11 @@
       "journal": "Animal Cognition 11: 389–400",
       "doi": "10.1007/s10071-007-0129-9",
       "url": "https://doi.org/10.1007/s10071-007-0129-9",
-      "open_access": "авторская копия: https://www.francoispachet.fr/wp-content/uploads/2021/01/molnar-08a.pdf",
+      "open_access": {
+        "kind": "url",
+        "url": "https://www.francoispachet.fr/wp-content/uploads/2021/01/molnar-08a.pdf",
+        "note_ru": "авторская копия"
+      },
       "licence": "проприетарная (цитируется, не воспроизводится)",
       "evidence_grade": "strong",
       "sample_ru": "6646 записей лая, 14 собак породы муди (4 кобеля, 10 сук), 6 операционально заданных ситуаций",
@@ -364,5 +368,145 @@
         "pongracz2005"
       ]
     }
-  ]
+  ],
+  "input_schema": [
+    {
+      "id": "signal_type",
+      "label_ru": "Тип сигнала",
+      "type": "choice",
+      "required": true,
+      "options": [
+        {
+          "value": "bark",
+          "label_ru": "Лай"
+        },
+        {
+          "value": "growl",
+          "label_ru": "Рычание"
+        },
+        {
+          "value": "whine",
+          "label_ru": "Скулёж"
+        },
+        {
+          "value": "howl",
+          "label_ru": "Вой"
+        }
+      ]
+    },
+    {
+      "id": "pitch",
+      "label_ru": "Высота тона",
+      "type": "choice",
+      "options": [
+        {
+          "value": "low",
+          "label_ru": "Низкий"
+        },
+        {
+          "value": "high",
+          "label_ru": "Высокий"
+        }
+      ],
+      "hint_ru": "Один из двух признаков, без которых эмоциональный профиль не определить."
+    },
+    {
+      "id": "repetition",
+      "label_ru": "Частота повторения",
+      "type": "choice",
+      "options": [
+        {
+          "value": "fast",
+          "label_ru": "Частая, звуки идут подряд"
+        },
+        {
+          "value": "slow",
+          "label_ru": "Редкая, с паузами"
+        }
+      ],
+      "hint_ru": "Второй обязательный признак для лая."
+    },
+    {
+      "id": "tonality",
+      "label_ru": "Тональность",
+      "type": "choice",
+      "options": [
+        {
+          "value": "tonal",
+          "label_ru": "Чистый, звонкий звук"
+        },
+        {
+          "value": "atonal",
+          "label_ru": "Шероховатый, шумный"
+        }
+      ],
+      "hint_ru": "Отделяет страх от игривости у высокого редкого лая."
+    },
+    {
+      "id": "duration",
+      "label_ru": "Длительность рычания",
+      "type": "choice",
+      "options": [
+        {
+          "value": "short",
+          "label_ru": "Короткое"
+        },
+        {
+          "value": "long",
+          "label_ru": "Долгое"
+        }
+      ],
+      "hint_ru": "Только для рычания."
+    },
+    {
+      "id": "reported_situation",
+      "label_ru": "Обстановка, если известна",
+      "type": "choice",
+      "options": [
+        {
+          "value": "play",
+          "label_ru": "Игра с человеком"
+        },
+        {
+          "value": "fight",
+          "label_ru": "Агрессивная схватка"
+        },
+        {
+          "value": "alone",
+          "label_ru": "Собака одна"
+        },
+        {
+          "value": "stranger",
+          "label_ru": "Появился чужой"
+        },
+        {
+          "value": "walk",
+          "label_ru": "Сборы на прогулку"
+        },
+        {
+          "value": "ball",
+          "label_ru": "Просит игрушку"
+        }
+      ],
+      "hint_ru": "Повышает априорный вес этой ситуации, но не назначает ответ."
+    },
+    {
+      "id": "play_bow",
+      "label_ru": "Был игровой поклон",
+      "type": "boolean",
+      "hint_ru": "Передние лапы на земле, круп поднят."
+    }
+  ],
+  "decision_rules": {
+    "description_ru": "Пороги и веса, по которым движок принимает решение. Все они наши, в источниках их нет.",
+    "refusal_threshold": 0.3,
+    "ambiguity_gap": 0.05,
+    "situation_prior_weight": 3.0,
+    "play_bow_prior_weight": 2.0,
+    "completeness_floor": 0.5,
+    "derivation": {
+      "kind": "heuristic",
+      "rationale_ru": "Порог отказа 0.30 согласован с другими видами; разрыв 0.05 отделяет выбор от совпадения; веса априора и нижняя граница полноты подобраны так, чтобы дополнительное наблюдение заметно, но не решающе меняло ответ. Ни одна из этих величин не измерена."
+    }
+  }
 }

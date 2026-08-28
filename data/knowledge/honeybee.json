@@ -20,7 +20,10 @@
       "journal": "PeerJ 9:e11187",
       "doi": "10.7717/peerj.11187",
       "url": "https://doi.org/10.7717/peerj.11187",
-      "open_access": "PMC8029670",
+      "open_access": {
+        "kind": "pmc",
+        "id": "PMC8029670"
+      },
       "licence": "CC BY 4.0",
       "evidence_grade": "strong",
       "sample_ru": "56 пчёл, 56 танцев, 1 колония, Apis mellifera carnica, дистанции 0.1–1.7 км, по 4 виляющих пробега на танец",
@@ -48,7 +51,10 @@
       "journal": "Scientific Reports 4: 4175",
       "doi": "10.1038/srep04175",
       "url": "https://doi.org/10.1038/srep04175",
-      "open_access": "PMC3935192",
+      "open_access": {
+        "kind": "pmc",
+        "id": "PMC3935192"
+      },
       "licence": "CC BY-NC-SA 3.0",
       "evidence_grade": "strong",
       "sample_ru": "358 виляющих пробегов; 304 из 358 (85%) укладываются в ±15°",
@@ -120,7 +126,11 @@
       "journal": "Science 379(6636): 1015–1018",
       "doi": "10.1126/science.ade1702",
       "url": "https://doi.org/10.1126/science.ade1702",
-      "open_access": "авторская копия: https://labs.biology.ucsd.edu/nieh/papers/DongScience.pdf",
+      "open_access": {
+        "kind": "url",
+        "url": "https://labs.biology.ucsd.edu/nieh/papers/DongScience.pdf",
+        "note_ru": "авторская копия"
+      },
       "licence": "проприетарная (цитируется, не воспроизводится)",
       "evidence_grade": "strong",
       "sample_ru": "Колонии, выращенные без пчёл-наставниц",
@@ -223,6 +233,13 @@
           "where_ru": "Schürch et al. 2016: 210 м против 310–320 м на одинаковом пробеге 0.4 с — расхождение около 50%"
         },
         "note_ru": "Это систематическое смещение, а не случайный разброс. Складывать его со статистическим интервалом нельзя — они показываются раздельно."
+      },
+      "interval": {
+        "sigma_multiplier": 2.0,
+        "derivation": {
+          "kind": "heuristic",
+          "rationale_ru": "Интервал строится как ±2 SD, то есть примерно 95% разброса. Выбор ширины — наш; в статье интервал в таком виде не приводится."
+        }
       }
     },
     "direction": {
@@ -259,6 +276,15 @@
         "derivation": {
           "kind": "heuristic",
           "rationale_ru": "Калибровка получена усреднением по 4 пробегам на танец. Меньшее число пробегов — отклонение от протокола источника. Конкретные множители в статье не приводятся."
+        },
+        "thresholds": {
+          "full_runs": 4,
+          "partial_runs": 2
+        },
+        "thresholds_derivation": {
+          "kind": "source",
+          "source_id": "kohl2021",
+          "where_ru": "протокол источника — усреднение по 4 виляющим пробегам на танец"
         }
       },
       "range_factor": {
@@ -320,25 +346,29 @@
       "id": "waggle_run_duration_s",
       "label_ru": "Длительность виляющей фазы, с",
       "type": "number",
-      "hint_ru": "Среднее по пробегам одного танца. Калибровка охватывает 0.41–2.20 с."
+      "hint_ru": "Среднее по пробегам одного танца. Калибровка охватывает 0.41–2.20 с.",
+      "example_ru": "например, 1.2"
     },
     {
       "id": "n_waggle_runs_measured",
       "label_ru": "Сколько пробегов измерено",
       "type": "integer",
-      "hint_ru": "Протокол источника — 4 пробега на танец."
+      "hint_ru": "Протокол источника — 4 пробега на танец.",
+      "example_ru": "например, 4"
     },
     {
       "id": "angle_from_vertical_deg",
       "label_ru": "Угол пробега от вертикали, °",
       "type": "number",
-      "hint_ru": "По часовой стрелке от направления «вверх» на вертикальном соте."
+      "hint_ru": "По часовой стрелке от направления «вверх» на вертикальном соте.",
+      "example_ru": "например, 40"
     },
     {
       "id": "sun_azimuth_deg",
       "label_ru": "Азимут солнца, °",
       "type": "number",
-      "hint_ru": "Без него направление считается только относительно солнца, не в компасных градусах."
+      "hint_ru": "Без него направление считается только относительно солнца, не в компасных градусах.",
+      "example_ru": "например, 180"
     },
     {
       "id": "dance_surface",

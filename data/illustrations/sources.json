@@ -1,0 +1,38 @@
+{
+  "honeybee": {
+    "subject": "пчела",
+    "author": "Lorc",
+    "licence": "CC BY 3.0",
+    "licence_url": "https://creativecommons.org/licenses/by/3.0/",
+    "source": "game-icons.net",
+    "page": "https://game-icons.net/1x1/lorc/bee.html",
+    "note_ru": "Обобщённая пиктограмма, а не изображение конкретного вида."
+  },
+  "dog": {
+    "subject": "собака",
+    "author": "Delapouite",
+    "licence": "CC BY 3.0",
+    "licence_url": "https://creativecommons.org/licenses/by/3.0/",
+    "source": "game-icons.net",
+    "page": "https://game-icons.net/1x1/delapouite/sitting-dog.html",
+    "note_ru": "Обобщённая пиктограмма, а не изображение конкретного вида."
+  },
+  "elephant": {
+    "subject": "слон",
+    "author": "Delapouite",
+    "licence": "CC BY 3.0",
+    "licence_url": "https://creativecommons.org/licenses/by/3.0/",
+    "source": "game-icons.net",
+    "page": "https://game-icons.net/1x1/delapouite/elephant.html",
+    "note_ru": "Обобщённая пиктограмма, а не изображение конкретного вида."
+  },
+  "spermwhale": {
+    "subject": "кашалот",
+    "author": "Delapouite",
+    "licence": "CC BY 3.0",
+    "licence_url": "https://creativecommons.org/licenses/by/3.0/",
+    "source": "game-icons.net",
+    "page": "https://game-icons.net/1x1/delapouite/sperm-whale.html",
+    "note_ru": "Обобщённая пиктограмма, а не изображение конкретного вида."
+  }
+}

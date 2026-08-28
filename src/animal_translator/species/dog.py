@@ -21,16 +21,6 @@ SLUG = "dog"
 
 ACOUSTIC_FIELDS = ("pitch", "repetition", "tonality")
 
-# Насколько сообщённая ситуация и игровой поклон сдвигают априорное распределение.
-# В источниках этих величин нет; в базе знаний они помечены как эвристики.
-SITUATION_PRIOR_WEIGHT = 3.0
-PLAY_BOW_PRIOR_WEIGHT = 2.0
-
-# Ниже этого порога верхний контекст не выдаётся как трактовка; распределение
-# при этом показывается. Порог общий для всех видов.
-REFUSAL_THRESHOLD = 0.30
-# Если две верхние версии расходятся меньше чем на эту величину, выбор не делается.
-AMBIGUITY_GAP = 0.05
 
 
 def _match_profile(kb: dict[str, Any], obs: dict[str, Any]) -> tuple[dict | None, Unknown | None]:
@@ -93,15 +83,16 @@ def _posterior(kb: dict[str, Any], candidates: list[str], obs: dict[str, Any]) -
 
     reported = obs.get("reported_situation")
     if reported in contexts:
-        prior[reported] *= SITUATION_PRIOR_WEIGHT
+        weight = kb["decision_rules"]["situation_prior_weight"]
+        prior[reported] *= weight
         notes.append(
             f"сообщённая ситуация «{next(c['label_ru'] for c in kb['contexts'] if c['id'] == reported)}» "
-            f"поднимает её априорный вес в {SITUATION_PRIOR_WEIGHT:.0f} раза"
+            f"поднимает её априорный вес в {weight:.0f} раза"
         )
 
     if obs.get("play_bow"):
         for c in ("play", "ball"):
-            prior[c] *= PLAY_BOW_PRIOR_WEIGHT
+            prior[c] *= kb["decision_rules"]["play_bow_prior_weight"]
         notes.append("игровой поклон повышает вес игровых контекстов")
 
     total_prior = sum(prior.values())
@@ -118,10 +109,11 @@ def _posterior(kb: dict[str, Any], candidates: list[str], obs: dict[str, Any]) -
     return {c: v / total for c, v in scores.items()}, notes
 
 
-def _completeness(obs: dict[str, Any]) -> float:
-    """Поправка на незаполненные акустические признаки. Величина эвристическая."""
+def _completeness(kb: dict[str, Any], obs: dict[str, Any]) -> float:
+    """Поправка на незаполненные акустические признаки."""
+    floor = kb["decision_rules"]["completeness_floor"]
     filled = sum(1 for f in ACOUSTIC_FIELDS if obs.get(f) is not None)
-    return 0.5 + 0.5 * (filled / len(ACOUSTIC_FIELDS))
+    return floor + (1 - floor) * (filled / len(ACOUSTIC_FIELDS))
 
 
 def _growl(kb: dict[str, Any], obs: dict[str, Any]) -> Result:
@@ -236,7 +228,7 @@ def translate(observation: dict[str, Any]) -> Result:
     ranked = sorted(posterior.items(), key=lambda kv: kv[1], reverse=True)
     top_ctx, top_p = ranked[0]
 
-    confidence = top_p * _completeness(observation)
+    confidence = top_p * _completeness(kb, observation)
     reliability = kb["reliability"]["per_context"][top_ctx]
 
     steps = [
@@ -263,13 +255,14 @@ def translate(observation: dict[str, Any]) -> Result:
     unknowns = [gap] if gap else []
     second_p = ranked[1][1]
 
-    if confidence < REFUSAL_THRESHOLD:
+    rules = kb["decision_rules"]
+    if confidence < rules["refusal_threshold"]:
         verdict = Verdict.INSUFFICIENT
         headline = (
             "Контекст не определён: ни одна трактовка не набирает "
-            f"{REFUSAL_THRESHOLD:.0%}. Ниже показано, что рассматривалось и с какими оценками."
+            f"{rules['refusal_threshold']:.0%}. Ниже показано, что рассматривалось и с какими оценками."
         )
-    elif top_p - second_p < AMBIGUITY_GAP:
+    elif top_p - second_p < rules["ambiguity_gap"]:
         verdict = Verdict.PARTIAL
         headline = (
             f"Неоднозначно: «{labels[top_ctx].lower()}» и «{labels[ranked[1][0]].lower()}» "

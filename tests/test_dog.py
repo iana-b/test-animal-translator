@@ -47,7 +47,7 @@ class TestHonestRefusal(unittest.TestCase):
     def test_sound_alone_does_not_reach_the_threshold(self):
         res = bark(pitch="low", repetition="fast", tonality="atonal")
         self.assertIs(res.verdict, Verdict.INSUFFICIENT)
-        self.assertLess(res.confidence, dog.REFUSAL_THRESHOLD)
+        self.assertLess(res.confidence, KB["decision_rules"]["refusal_threshold"])
 
     def test_refusal_still_shows_the_reasoning(self):
         res = bark(pitch="low", repetition="fast", tonality="atonal")

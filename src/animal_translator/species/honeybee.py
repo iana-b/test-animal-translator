@@ -19,9 +19,6 @@ _COMPASS_RU = [
     "Ю", "ЮЮЗ", "ЮЗ", "ЗЮЗ", "З", "ЗСЗ", "СЗ", "ССЗ",
 ]
 
-# Интервал расстояния строится как ±2 SD, то есть примерно 95% разброса.
-SIGMA_MULTIPLIER = 2.0
-
 
 def _compass_ru(bearing_deg: float) -> str:
     return _COMPASS_RU[int((bearing_deg % 360) / 22.5 + 0.5) % 16]
@@ -50,8 +47,9 @@ def _invert_duration(kb: dict[str, Any], duration_s: float) -> tuple[float, floa
 
 def _sd_for_distance(kb: dict[str, Any], km: float) -> float:
     """SD длительности растёт с расстоянием: интерполяция между двумя точками статьи."""
-    sd = kb["quantitative_model"]["distance"]["sd_model"]
-    lo_km, hi_km = 0.1, 1.7
+    model = kb["quantitative_model"]["distance"]
+    sd = model["sd_model"]
+    lo_km, hi_km = model["calibrated_range_km"]
     lo_sd, hi_sd = sd["sd_at_100m_s"], sd["sd_at_1700m_s"]
     clamped = min(max(km, lo_km), hi_km)
     frac = (clamped - lo_km) / (hi_km - lo_km)
@@ -64,11 +62,12 @@ def estimate_distance(kb: dict[str, Any], duration_s: float) -> DistanceEstimate
     if km <= 0:
         return None
     sigma_km = _sd_for_distance(kb, km) / slope
+    multiplier = model["interval"]["sigma_multiplier"]
     lo_s, hi_s = model["calibrated_range_duration_s"]
     return DistanceEstimate(
         metres=km * 1000,
-        low_metres=max(0.0, (km - SIGMA_MULTIPLIER * sigma_km) * 1000),
-        high_metres=(km + SIGMA_MULTIPLIER * sigma_km) * 1000,
+        low_metres=max(0.0, (km - multiplier * sigma_km) * 1000),
+        high_metres=(km + multiplier * sigma_km) * 1000,
         sigma_metres=sigma_km * 1000,
         extrapolated=not (lo_s <= duration_s <= hi_s),
     )
@@ -82,11 +81,12 @@ def _distance_confidence(kb: dict[str, Any], est: DistanceEstimate, obs: dict[st
 
     runs = obs.get("n_waggle_runs_measured")
     protocol = f["protocol_factor"]["values"]
-    if runs is None or runs >= 4:
+    limits = f["protocol_factor"]["thresholds"]
+    if runs is None or runs >= limits["full_runs"]:
         pf = protocol["runs_ge_4"]
-    elif runs >= 2:
+    elif runs >= limits["partial_runs"]:
         pf = protocol["runs_2_or_3"]
-        notes.append(f"измерено {runs} пробега вместо четырёх по протоколу источника")
+        notes.append(f"измерено {runs} пробега вместо {limits['full_runs']} по протоколу источника")
     else:
         pf = protocol["runs_1"]
         notes.append("измерен один пробег: протокол источника требует усреднения по четырём")
@@ -117,10 +117,7 @@ def _direction(kb: dict[str, Any], obs: dict[str, Any]) -> tuple[Step | None, Un
         return None, Unknown(
             field_ru="Направление",
             kind=UnknownKind.NOT_APPLICABLE,
-            explanation_ru=(
-                "Танец на горизонтальной поверхности под открытым небом: пчела направляет пробег "
-                "прямо на цель, гравитационного пересчёта нет. Угол от вертикали здесь не работает."
-            ),
+            explanation_ru=direction["surface_note_ru"],
         ), None
 
     if angle is None:
