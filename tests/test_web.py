@@ -286,3 +286,45 @@ class TestKnowledgePageNavigation(unittest.TestCase):
             html = web.knowledge_page(load_species(slug)).decode("utf-8")
             with self.subTest(slug):
                 self.assertIn(f'class="back" href="/species/{slug}"', html)
+
+
+class TestMethodologyIsShown(unittest.TestCase):
+    """Страница называется «база знаний, методика и мифы» — методика должна быть."""
+
+    def test_every_species_has_a_methodology_section(self):
+        for slug in SLUGS:
+            html = web.knowledge_page(load_species(slug)).decode("utf-8")
+            with self.subTest(slug):
+                self.assertIn("Методика", html)
+
+    def test_dog_reliability_numbers_reach_the_page(self):
+        import html as html_mod
+
+        kb = load_species("dog")
+        html = web.knowledge_page(kb).decode("utf-8")
+        rel = kb["reliability"]
+        self.assertIn(f'{rel["overall_accuracy"]:.0%}', html)
+        self.assertIn(f'{rel["random_baseline"]:.0%}', html)
+        import html as html_mod
+
+        for ctx, stats in rel["per_context"].items():
+            with self.subTest(ctx):
+                self.assertIn(html_mod.escape(stats["p_ru"]), html)
+
+    def test_bee_equations_reach_the_page(self):
+        kb = load_species("honeybee")
+        html = web.knowledge_page(kb).decode("utf-8")
+        near, _ = kb["quantitative_model"]["distance"]["forward_equations"]
+        self.assertIn(str(near["intercept_s"]), html)
+        self.assertIn(str(near["slope_s_per_km"]), html)
+        self.assertIn(kb["quantitative_model"]["distance"]["subspecies"], html)
+
+    def test_sample_size_of_each_source_is_shown(self):
+        for slug in SLUGS:
+            kb = load_species(slug)
+            html = web.knowledge_page(kb).decode("utf-8")
+            for source in kb["sources"]:
+                with self.subTest(slug=slug, source=source["id"]):
+                    import html as html_mod
+
+                    self.assertIn(html_mod.escape(source["sample_ru"][:40]), html)

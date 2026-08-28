@@ -123,6 +123,13 @@ ul.src li:last-child { border-bottom:0; }
 .grade { font-size:14.5px; color:var(--dim); }
 .grade a { color:var(--dim); }
 .myth { margin-bottom:22px; max-width:80ch; }
+table.m { border-collapse:collapse; width:100%; margin:6px 0 18px; font-size:16px; }
+table.m th, table.m td { text-align:left; padding:8px 12px 8px 0; border-bottom:1px solid var(--line);
+                         vertical-align:top; }
+table.m th { font-weight:600; color:var(--dim); font-size:14.5px; }
+table.m td.n { font-family:"SFMono-Regular",Menlo,Consolas,monospace; font-variant-numeric:tabular-nums;
+               white-space:nowrap; }
+.kind { font-size:13.5px; color:var(--dim); }
 .myth b { color:var(--warn); }
 .err { border-left:4px solid var(--warn); padding-left:16px; font-size:17px; }
 
@@ -303,6 +310,80 @@ def _oa_fragment(source: dict[str, Any]) -> str:
     return ' · <span class="grade">полный текст закрыт</span>'
 
 
+def _rows(pairs: list[tuple[str, str]]) -> str:
+    body = "".join(f'<tr><td>{e(k)}</td><td class="n">{e(v)}</td></tr>' for k, v in pairs)
+    return f'<table class="m">{body}</table>'
+
+
+def _methodology(kb: dict[str, Any]) -> str:
+    """Числа, на которых стоит разбор вида. Собирается из тех же полей, что и расчёт."""
+    out: list[str] = []
+
+    model = kb.get("quantitative_model", {}).get("distance")
+    if model:
+        near, far = model["forward_equations"]
+        out.append("<p>Расстояние вычисляется по сегментированной регрессии; уравнения обращаются.</p>")
+        out.append(_rows([
+            ("Ближний сегмент", f'tw = {near["intercept_s"]} + {near["slope_s_per_km"]} · d'),
+            ("Дальний сегмент", f'tw = {far["intercept_s"]} + {far["slope_s_per_km"]} · d'),
+            ("Точка перелома", f'{model["breakpoint_km"]} км ({model["breakpoint_duration_s"]} с)'),
+            ("Качество подгонки", f'R² = {model["r_squared"]}'),
+            ("Откалибровано на", f'{model["subspecies"]}, {model["calibrated_range_km"][0]}–'
+                                 f'{model["calibrated_range_km"][1]} км'),
+        ]))
+
+    formula = kb.get("confidence_model", {}).get("formula_ru")
+    if formula:
+        out.append(f'<p><code>{e(formula)}</code></p>')
+        rows = []
+        for name, factor in kb["confidence_model"]["factors"].items():
+            kind = factor["derivation"]["kind"]
+            mark = "из статьи" if kind == "source" else "эвристика"
+            rows.append((name, mark))
+        out.append(_rows(rows))
+
+    rel = kb.get("reliability")
+    if rel:
+        out.append("<p>Насколько вообще надёжно распознаётся контекст по звуку.</p>")
+        out.append(_rows([
+            ("Общая точность", f'{rel["overall_accuracy"]:.0%}'),
+            ("Случайный уровень", f'{rel["random_baseline"]:.0%}'),
+            ("Каппа", f'{rel["overall_kappa"]:+.0%}'),
+            ("Распознавание особи", f'{rel["individual_recognition"]:.0%}'),
+        ]))
+        labels = {c["id"]: c["label_ru"] for c in kb["contexts"]}
+        body = "".join(
+            f'<tr><td>{e(labels[c])}</td><td class="n">{s["recall"]:.0%}</td>'
+            f'<td class="n">{s["kappa"]:+.0%}</td>'
+            f'<td class="kind">{"значимо лучше случайного" if s["better_than_random"] else "не отличается от случайного"}'
+            f' ({e(s["p_ru"])})</td></tr>'
+            for c, s in rel["per_context"].items())
+        out.append('<table class="m"><tr><th>Контекст</th><th>Распознаётся</th><th>Каппа</th>'
+                   f'<th>Значимость</th></tr>{body}</table>')
+
+    tiers = kb.get("evidence_tiers")
+    if tiers:
+        out.append(f'<p>{e(tiers["description_ru"])}</p>')
+        body = "".join(f'<tr><td>{e(l["label_ru"])}</td><td>{e(l["meaning_ru"])}</td></tr>'
+                       for l in tiers["levels"])
+        out.append(f'<table class="m">{body}</table>')
+
+    structure = kb.get("structure")
+    if structure:
+        out.append(f'<p>{e(structure["description_ru"])}</p>')
+        body = "".join(
+            f'<tr><td>{e(f["label_ru"])}</td><td>{e(f["what_ru"])}</td>'
+            f'<td class="n">{f["published_types"] or "—"}</td></tr>'
+            for f in structure["features"])
+        out.append('<table class="m"><tr><th>Признак</th><th>Что измеряется</th>'
+                   f'<th>Типов в статье</th></tr>{body}</table>')
+        out.append(f'<p class="kind">{e(structure["classification_limit_ru"])}</p>')
+
+    if not out:
+        return ""
+    return '<div class="panel" style="margin-top:20px"><h2 id="methodology">Методика</h2>' + "".join(out) + "</div>"
+
+
 def _hero(slug: str, kb: dict[str, Any], label: str = "") -> str:
     tag = f'<span class="label">{e(label)}</span><br>' if label else ''
     return (f'<div class="hero"><div class="art">{svg(slug)}</div>'
@@ -332,6 +413,8 @@ def knowledge_page(kb: dict[str, Any]) -> bytes:
            f'<p class="scope">Движок: <code>{e(kb["engine"])}</code>. '
            f'Зрелость исследований: {e(kb.get("research_maturity_ru", "—"))}</p></div>']
 
+    out.append(_methodology(kb))
+
     out.append('<div class="panel" style="margin-top:20px"><h2>Мифы</h2>')
     for m in kb["myths"]:
         refs = " ".join(f'<span class="tag ref">{e(i)}</span>' for i in m["source_ids"])
@@ -339,7 +422,7 @@ def knowledge_page(kb: dict[str, Any]) -> bytes:
                    f'<b style="color:var(--mark)">На деле:</b> {e(m["reality_ru"])} {refs}</div>')
     out.append("</div>")
 
-    out.append('<div class="panel" style="margin-top:20px"><h2>Источники</h2><ul class="src">')
+    out.append('<div class="panel" style="margin-top:20px"><h2 id="sources">Источники</h2><ul class="src">')
     for s in kb["sources"]:
         link, label = _link_label(s)
         extra = ""
@@ -354,7 +437,9 @@ def knowledge_page(kb: dict[str, Any]) -> bytes:
             + (f'<a href="{e(link)}" target="_blank" rel="noopener">{e(label)}</a>' if link else "")
             + _oa_fragment(s)
             + f'<br><span class="grade">доказательность: {e(s["evidence_grade"])} · '
-              f'лицензия: {e(s["licence"])}</span><br>{e(s["gives_ru"])}{extra}</li>'
+              f'лицензия: {e(s["licence"])}</span>'
+              f'<br><span class="grade">выборка: {e(s["sample_ru"])}</span>'
+              f'<br>{e(s["gives_ru"])}{extra}</li>'
         )
     out.append("</ul></div>")
     back = (f'<a class="back" href="/species/{kb["slug"]}">← Вернуться к разбору сигнала</a>')

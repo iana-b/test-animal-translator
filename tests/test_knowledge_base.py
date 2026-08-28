@@ -295,3 +295,27 @@ class TestReadmeMatchesKnowledgeBase(unittest.TestCase):
         for path in re.findall(r"!\[[^\]]*\]\(([^)]+)\)", readme):
             with self.subTest(path):
                 self.assertTrue((root / path).exists(), f"нет файла {path}")
+
+
+class TestReadmeNumbersAreCurrent(unittest.TestCase):
+    """Число тестов указано в README; оно не должно расходиться с действительным."""
+
+    def test_declared_test_count_matches_reality(self):
+        import ast
+        import re
+
+        root = Path(__file__).resolve().parents[1]
+        readme = (root / "README.md").read_text(encoding="utf-8")
+        declared = {int(m) for m in re.findall(r"(\d+)\s+тест[аов]*", readme)}
+
+        actual = 0
+        for path in (root / "tests").glob("test_*.py"):
+            tree = ast.parse(path.read_text(encoding="utf-8"))
+            for node in ast.walk(tree):
+                if isinstance(node, ast.ClassDef):
+                    actual += sum(1 for item in node.body
+                                  if isinstance(item, ast.FunctionDef)
+                                  and item.name.startswith("test_"))
+
+        self.assertEqual(declared, {actual},
+                         f"README обещает {declared}, тестов на деле {actual}")
