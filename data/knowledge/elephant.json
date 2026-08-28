@@ -1,0 +1,325 @@
+{
+  "slug": "elephant",
+  "name_ru": "Африканский саванный слон",
+  "name_en": "African savanna elephant",
+  "scientific_name": "Loxodonta africana",
+  "engine": "evidence_tiered",
+  "engine_note_ru": "Разбор строится не на расчёте и не на вероятностях, а на том, каким экспериментом подкреплена трактовка. Значения, проверенные проигрыванием записи живым слонам, отделены от тех, что известны только по совместной встречаемости с ситуацией, и вторые не могут вытеснить первые.",
+  "research_maturity_ru": "Для части сигналов значение установлено причинно: запись проигрывали слонам и наблюдали предсказанную реакцию. Для остальных известна только связь с контекстом.",
+  "human_hearing": {
+    "note_ru": "Основная частота рёва лежит в диапазоне 14–35 Гц, а нижний порог человеческого слуха — около 20 Гц. Человек рядом со слоном слышит гармоники и ощущает вибрацию, но саму несущую частоту не воспринимает.",
+    "f0_range_hz": [
+      14,
+      35
+    ],
+    "human_hearing_floor_hz": 20,
+    "source_id": "poole1988",
+    "derivation": {
+      "kind": "source",
+      "where_ru": "Poole et al. 1988: диапазон основной частоты низкочастотных криков"
+    }
+  },
+  "sources": [
+    {
+      "id": "poole1988",
+      "authors": "Poole J.H., Payne K., Langbauer W.R., Moss C.J.",
+      "year": 1988,
+      "title": "The social contexts of some very low frequency calls of African elephants",
+      "journal": "Behavioral Ecology and Sociobiology 22: 385–392",
+      "doi": "10.1007/BF00294975",
+      "url": "https://doi.org/10.1007/BF00294975",
+      "open_access": null,
+      "licence": "проприетарная (цитируется, не воспроизводится)",
+      "evidence_grade": "strong",
+      "sample_ru": "Полевые наблюдения за низкочастотными криками и сопутствующими ситуациями",
+      "gives_ru": "Описание социальных контекстов низкочастотных криков и диапазон основной частоты 14–35 Гц. Связь установлена по совместной встречаемости, без проигрывания записей"
+    },
+    {
+      "id": "king2010",
+      "authors": "King L.E., Soltis J., Douglas-Hamilton I., Savage A., Vollrath F.",
+      "year": 2010,
+      "title": "Bee threat elicits alarm call in African elephants",
+      "journal": "PLoS ONE 5: e10346",
+      "doi": "10.1371/journal.pone.0010346",
+      "url": "https://doi.org/10.1371/journal.pone.0010346",
+      "open_access": "PLoS ONE, полный текст открыт",
+      "licence": "CC BY",
+      "evidence_grade": "strong",
+      "sample_ru": "15 проигрываний звука потревоженных пчёл и 13 контрольных с белым шумом; отдельно по 10 проигрываний трёх типов рёва",
+      "gives_ru": "На звук пчёл семьи уходили в 14 случаях из 15 (93%) против 6 из 13 (46%) на белый шум, средняя дистанция ухода 71.67 м против 32.3 м. Проигрывание самого пчелиного рёва вызвало уход у 6 семей из 10 против 2 из 10 на контрольный рёв. Тряска головой усиливалась значимо (p = 0.002)"
+    },
+    {
+      "id": "soltis2014",
+      "authors": "Soltis J., King L.E., Douglas-Hamilton I., Vollrath F., Savage A.",
+      "year": 2014,
+      "title": "African elephant alarm calls distinguish between threats from humans and bees",
+      "journal": "PLoS ONE 9: e89403",
+      "doi": "10.1371/journal.pone.0089403",
+      "url": "https://doi.org/10.1371/journal.pone.0089403",
+      "open_access": "PLoS ONE, полный текст открыт",
+      "licence": "CC BY",
+      "evidence_grade": "strong",
+      "sample_ru": "Проигрывание голосов самбуру 14 семьям, звука пчёл 15 семьям, белого шума 13 семьям; проигрывание самих рёвов — по 10 семей на тип",
+      "gives_ru": "Два типа тревоги различаются и акустически, и поведенчески. У пчелиного рёва растёт вторая форманта; у человеческого — первая и вторая (F1 значимо только для людей: U = 84.5, p = 0.004; для пчёл U = 152.5, p = 0.426). Тряска головой возникала только в ответ на пчёл и на пчелиный рёв"
+    },
+    {
+      "id": "mccomb2003",
+      "authors": "McComb K., Reby D., Baker L., Moss C., Sayialel S.",
+      "year": 2003,
+      "title": "Long-distance communication of acoustic cues to social identity in African elephants",
+      "journal": "Animal Behaviour 65: 317–329",
+      "doi": "10.1006/anbe.2003.2047",
+      "url": "https://doi.org/10.1006/anbe.2003.2047",
+      "open_access": null,
+      "licence": "проприетарная (цитируется, не воспроизводится)",
+      "evidence_grade": "strong",
+      "sample_ru": "Проигрывание контактных рёвов знакомых и незнакомых особей",
+      "gives_ru": "Слоны различают социальную принадлежность зовущего по контактному рёву на большом расстоянии. Значение проверено проигрыванием"
+    },
+    {
+      "id": "poole1999",
+      "authors": "Poole J.H.",
+      "year": 1999,
+      "title": "Signals and assessment in African elephants: evidence from playback experiments",
+      "journal": "Animal Behaviour 58: 185–193",
+      "doi": "10.1006/anbe.1999.1117",
+      "url": "https://doi.org/10.1006/anbe.1999.1117",
+      "open_access": null,
+      "licence": "проприетарная (цитируется, не воспроизводится)",
+      "evidence_grade": "strong",
+      "sample_ru": "Серия проигрываний записей слонам в поле",
+      "gives_ru": "Методическая основа: значение сигнала проверяется проигрыванием записи и наблюдением предсказанной реакции, а не только совместной встречаемостью с ситуацией"
+    },
+    {
+      "id": "pardo2024",
+      "authors": "Pardo M.A., Fristrup K., Lolchuragi D.S., Poole J.H., Granli P., Moss C., Douglas-Hamilton I., Wittemyer G.",
+      "year": 2024,
+      "title": "African elephants address one another with individually specific name-like calls",
+      "journal": "Nature Ecology & Evolution 8: 1353–1364",
+      "doi": "10.1038/s41559-024-02420-w",
+      "url": "https://doi.org/10.1038/s41559-024-02420-w",
+      "open_access": null,
+      "licence": "проприетарная (цитируется, не воспроизводится)",
+      "evidence_grade": "moderate",
+      "sample_ru": "Полный текст закрыт; использованы утверждения из официальной аннотации, числовые детали из статьи не переносились",
+      "gives_ru": "Получателя обращения можно предсказать по акустической структуре зова независимо от того, насколько зов похож на вокализации самого получателя. Слоны реагировали иначе на проигрывание зовов, адресованных им, чем на зовы, адресованные другой особи",
+      "correction": {
+        "doi": "10.1038/s41559-025-02823-3",
+        "url": "https://doi.org/10.1038/s41559-025-02823-3",
+        "journal": "Nature Ecology & Evolution 9: 1527–1528 (2025)",
+        "what_ru": "Одна точка данных playback-эксперимента была перенесена в итоговую таблицу неверно; пересчёт видео- и аудиозаписей всех проб выявил ещё четыре ошибки. Качественно результаты не изменились, статистическая значимость сохранилась."
+      }
+    },
+    {
+      "id": "herbst2012",
+      "authors": "Herbst C.T., Stoeger A.S., Frey R., Lohscheller J., Titze I.R., Gumpenberger M., Fitch W.T.",
+      "year": 2012,
+      "title": "How low can you go? Physical production mechanism of elephant infrasonic vocalizations",
+      "journal": "Science 337: 595–599",
+      "doi": "10.1126/science.1219712",
+      "url": "https://doi.org/10.1126/science.1219712",
+      "open_access": null,
+      "licence": "проприетарная (цитируется, не воспроизводится)",
+      "evidence_grade": "strong",
+      "sample_ru": "Прямое наблюдение работы гортани слона",
+      "gives_ru": "Инфразвук возникает обычными колебаниями голосовых складок под действием потока воздуха, а не отдельными мышечными сокращениями"
+    },
+    {
+      "id": "oconnell2007",
+      "authors": "O'Connell-Rodwell C.E.",
+      "year": 2007,
+      "title": "Keeping an “ear” to the ground: seismic communication in elephants",
+      "journal": "Physiology 22: 287–294",
+      "doi": "10.1152/physiol.00008.2007",
+      "url": "https://doi.org/10.1152/physiol.00008.2007",
+      "open_access": null,
+      "licence": "проприетарная (цитируется, не воспроизводится)",
+      "evidence_grade": "moderate",
+      "sample_ru": "Обзор сейсмической составляющей коммуникации",
+      "gives_ru": "Часть сигнала распространяется по грунту как сейсмические колебания, а не только по воздуху"
+    }
+  ],
+  "evidence_tiers": {
+    "description_ru": "Чем подкреплена трактовка. Порядок строгий: нижний уровень не может вытеснить верхний.",
+    "source_id": "poole1999",
+    "derivation": {
+      "kind": "source",
+      "where_ru": "Poole 1999: проигрывание как способ причинной проверки значения сигнала"
+    },
+    "levels": [
+      {
+        "id": "playback_verified",
+        "rank": 3,
+        "label_ru": "Проверено проигрыванием",
+        "meaning_ru": "Запись проиграли живым слонам и получили предсказанную реакцию. Причинная связь показана."
+      },
+      {
+        "id": "contextual",
+        "rank": 2,
+        "label_ru": "Связь с контекстом",
+        "meaning_ru": "Сигнал наблюдали в определённой ситуации, но проигрыванием не проверяли. Совместная встречаемость, а не доказанное значение."
+      },
+      {
+        "id": "descriptive",
+        "rank": 1,
+        "label_ru": "Только описание",
+        "meaning_ru": "Тип сигнала описан в сводке, отдельного исследования его значения нет."
+      }
+    ]
+  },
+  "signals": [
+    {
+      "id": "bee_alarm",
+      "label_ru": "Тревожный рёв на пчёл",
+      "translation_ru": "«Пчёлы»: тревога, связанная именно с пчелиной угрозой.",
+      "evidence_tier": "playback_verified",
+      "match": {
+        "headshaking": true
+      },
+      "supporting": {
+        "threat_present": "bees",
+        "group_response": "retreat"
+      },
+      "playback_response": {
+        "retreated": 6,
+        "of_trials": 10,
+        "control_retreated": 2,
+        "control_of_trials": 10,
+        "source_id": "king2010",
+        "derivation": {
+          "kind": "source",
+          "where_ru": "King et al. 2010: проигрывание пчелиного рёва — 6 семей из 10 ушли против 2 из 10 на контрольный рёв"
+        }
+      },
+      "discriminator_ru": "Тряска головой возникает только на пчёл и на пчелиный рёв — это единственный поведенческий признак, надёжно отделяющий пчелиную тревогу от человеческой.",
+      "acoustic_ru": "У пчелиного рёва растёт вторая форманта, первая остаётся как в контроле (U = 152.5, p = 0.426).",
+      "source_ids": [
+        "king2010",
+        "soltis2014"
+      ],
+      "alternatives_ru": [
+        "Человеческая тревога, если тряски головой не было"
+      ]
+    },
+    {
+      "id": "human_alarm",
+      "label_ru": "Тревожный рёв на людей",
+      "translation_ru": "«Люди»: тревога, связанная с присутствием людей.",
+      "evidence_tier": "playback_verified",
+      "match": {
+        "headshaking": false,
+        "threat_present": "humans"
+      },
+      "supporting": {
+        "group_response": "retreat"
+      },
+      "acoustic_ru": "У человеческой тревоги растут обе форманты; рост первой значим только для людей (U = 84.5, p = 0.004).",
+      "discriminator_ru": "Тряски головой при человеческой тревоге не наблюдали.",
+      "source_ids": [
+        "soltis2014"
+      ],
+      "alternatives_ru": [
+        "Пчелиная тревога, если тряска головой всё же была"
+      ]
+    },
+    {
+      "id": "contact",
+      "label_ru": "Контактный рёв",
+      "translation_ru": "Контактный зов: обращение к сородичам на расстоянии, несущее признаки принадлежности зовущего.",
+      "evidence_tier": "playback_verified",
+      "match": {
+        "separation": true
+      },
+      "supporting": {
+        "group_response": "vocal_reply"
+      },
+      "discriminator_ru": "Слоны различают по такому рёву, свой это или чужой, на большом расстоянии.",
+      "source_ids": [
+        "mccomb2003"
+      ],
+      "alternatives_ru": [
+        "Индивидуальное обращение к конкретной особи"
+      ]
+    },
+    {
+      "id": "addressed_call",
+      "label_ru": "Индивидуальное обращение",
+      "translation_ru": "Обращение к конкретной особи: зов несёт признаки адресата, не подражая его собственным звукам.",
+      "evidence_tier": "playback_verified",
+      "match": {
+        "single_addressee_responded": true
+      },
+      "discriminator_ru": "Отвечает одна особь, остальные не реагируют.",
+      "source_ids": [
+        "pardo2024"
+      ],
+      "alternatives_ru": [
+        "Обычный контактный зов, на который откликнулся ближайший сородич"
+      ]
+    },
+    {
+      "id": "lets_go",
+      "label_ru": "Рёв «идём»",
+      "translation_ru": "Побуждение к общему движению: сигнал, сопровождающий начало перемещения группы.",
+      "evidence_tier": "contextual",
+      "match": {
+        "group_response": "coordinated_departure"
+      },
+      "discriminator_ru": "Наблюдался в ситуациях начала движения группы. Проигрыванием значение не проверялось.",
+      "source_ids": [
+        "poole1988"
+      ],
+      "alternatives_ru": [
+        "Контактный зов отставшей особи"
+      ]
+    },
+    {
+      "id": "greeting",
+      "label_ru": "Рёв приветствия",
+      "translation_ru": "Приветствие при встрече после разлуки.",
+      "evidence_tier": "contextual",
+      "match": {
+        "reunion": true
+      },
+      "discriminator_ru": "Наблюдался при воссоединении. Проигрыванием значение не проверялось.",
+      "source_ids": [
+        "poole1988"
+      ],
+      "alternatives_ru": [
+        "Контактный зов при сближении групп"
+      ]
+    }
+  ],
+  "myths": [
+    {
+      "claim_ru": "Инфразвук слоны производят особым органом или мышечными сокращениями.",
+      "reality_ru": "Инфразвук возникает обычными колебаниями голосовых складок под действием потока воздуха — тем же механизмом, что и человеческая речь.",
+      "source_ids": [
+        "herbst2012"
+      ]
+    },
+    {
+      "claim_ru": "Если человек стоит рядом со слоном, он слышит весь его сигнал.",
+      "reality_ru": "Основная частота рёва лежит в диапазоне 14–35 Гц, а слух человека начинается примерно с 20 Гц. Значительная часть сигнала не воспринимается на слух, а часть распространяется по грунту как сейсмические колебания.",
+      "source_ids": [
+        "poole1988",
+        "oconnell2007"
+      ]
+    },
+    {
+      "claim_ru": "Тревожный рёв у слонов один и означает просто «опасность».",
+      "reality_ru": "Тревога на пчёл и тревога на людей различаются акустически и по реакции: тряска головой возникает только при пчелиной угрозе.",
+      "source_ids": [
+        "soltis2014"
+      ]
+    },
+    {
+      "claim_ru": "Названия рёвов вроде «идём» или «приветствие» — установленные значения.",
+      "reality_ru": "Эти названия отражают ситуации, в которых сигнал наблюдали, а не проверенное значение. Причинная проверка проигрыванием проведена лишь для части сигналов.",
+      "source_ids": [
+        "poole1988",
+        "poole1999"
+      ]
+    }
+  ]
+}

@@ -116,3 +116,29 @@ class TestSpeciesDifferByDesign(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestNoDecorativeBibliography(unittest.TestCase):
+    """Источник, на который ничто не ссылается, ничего не подкрепляет."""
+
+    def test_every_source_is_actually_used(self):
+        for slug, kb in SPECIES.items():
+            referenced: set[str] = set()
+
+            def walk(node):
+                if isinstance(node, dict):
+                    for key, value in node.items():
+                        if key == "source_ids" and isinstance(value, list):
+                            referenced.update(value)
+                        elif key.endswith("source_id") and isinstance(value, str):
+                            referenced.add(value)
+                        else:
+                            walk(value)
+                elif isinstance(node, list):
+                    for item in node:
+                        walk(item)
+
+            walk(kb)
+            unused = {s["id"] for s in kb["sources"]} - referenced
+            with self.subTest(slug):
+                self.assertEqual(unused, set(), f"{slug}: источники не используются: {sorted(unused)}")
