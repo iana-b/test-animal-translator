@@ -28,29 +28,34 @@ CHROME_CANDIDATES = [
     "chromium",
 ]
 
+# Страницы вида снимаются одной высотой: её хватает самой длинной форме (пчела),
+# и рядом с формой одинаково видно начало разбора.
+SPECIES_VIEW = 1650
+
 SHOTS = [
     ("01-species", "/", 1280, 900,
      "Выбор вида"),
     ("02-bee-full", "/species/honeybee?dance_type=waggle&waggle_run_duration_s=1.2"
                     "&n_waggle_runs_measured=4&angle_from_vertical_deg=40"
-                    "&sun_azimuth_deg=180&individual_calibration_known=yes", 1280, 1700,
+                    "&sun_azimuth_deg=180&individual_calibration_known=yes", 1280, SPECIES_VIEW,
      "Пчела: расстояние и направление посчитаны, уверенность 85%"),
-    ("03-bee-gap", "/species/honeybee?dance_type=waggle&waggle_run_duration_s=0.6", 1280, 1500,
+    ("03-bee-gap", "/species/honeybee?dance_type=waggle&waggle_run_duration_s=0.6",
+     1280, SPECIES_VIEW,
      "Пчела: угол не измерен — направление помечено как пробел в наблюдении"),
     ("04-dog-refusal", "/species/dog?signal_type=bark&pitch=low&repetition=fast"
-                       "&tonality=atonal", 1280, 1350,
+                       "&tonality=atonal", 1280, SPECIES_VIEW,
      "Собака: по одному звуку контекст не определяется, показано всё распределение"),
     ("05-dog-context", "/species/dog?signal_type=bark&pitch=low&repetition=fast"
-                       "&tonality=atonal&reported_situation=stranger", 1280, 1600,
+                       "&tonality=atonal&reported_situation=stranger", 1280, SPECIES_VIEW,
      "Собака: обстановка сузила распределение до 47%"),
     ("06-elephant", "/species/elephant?perceived=heard&f0_hz=18&headshaking=yes"
-                    "&threat_present=bees&group_response=retreat", 1280, 1250,
+                    "&threat_present=bees&group_response=retreat", 1280, SPECIES_VIEW,
      "Слон: значение проверено проигрыванием, 6 семей из 10"),
     ("07-whale", "/species/spermwhale?signal_type=coda"
                  "&inter_click_intervals_s=0.12,0.12,0.35,0.12&extra_final_click=yes"
-                 "&exchange_durations_s=0.71,0.74,0.78,0.80", 1280, 1250,
+                 "&exchange_durations_s=0.71,0.74,0.78,0.80", 1280, SPECIES_VIEW,
      "Кашалот: структура разобрана, значения не существует"),
-    ("08-whale-clicks", "/species/spermwhale?signal_type=usual_clicks", 1280, 1050,
+    ("08-whale-clicks", "/species/spermwhale?signal_type=usual_clicks", 1280, SPECIES_VIEW,
      "Кашалот: единственный сигнал, у которого функция установлена измерениями"),
     ("09-knowledge", "/species/spermwhale/kb", 1280, 2700,
      "База знаний целиком: методика, мифы и источники с выборками и лицензиями"),
