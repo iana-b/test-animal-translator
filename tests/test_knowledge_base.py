@@ -319,3 +319,37 @@ class TestReadmeNumbersAreCurrent(unittest.TestCase):
 
         self.assertEqual(declared, {actual},
                          f"README обещает {declared}, тестов на деле {actual}")
+
+
+class TestReadmeTableOfContents(unittest.TestCase):
+    """Оглавление должно покрывать все разделы и не вести в никуда."""
+
+    @staticmethod
+    def _anchor(title: str) -> str:
+        import re
+
+        return re.sub(r"[^\wа-яё-]", "", title.lower().replace(" ", "-"))
+
+    def setUp(self):
+        import re
+
+        self.readme = (Path(__file__).resolve().parents[1] / "README.md").read_text(encoding="utf-8")
+        self.headings = re.findall(r"^## (.+)$", self.readme, re.M)
+        self.entries = re.findall(r"^- \[([^\]]+)\]\(#([^)]+)\)", self.readme, re.M)
+
+    def test_every_link_points_to_an_existing_heading(self):
+        anchors = {self._anchor(h) for h in self.headings}
+        for title, anchor in self.entries:
+            with self.subTest(title):
+                self.assertIn(anchor, anchors)
+
+    def test_every_section_is_listed(self):
+        listed = {anchor for _, anchor in self.entries}
+        missing = [h for h in self.headings
+                   if h != "Содержание" and self._anchor(h) not in listed]
+        self.assertEqual(missing, [], "разделы не попали в оглавление")
+
+    def test_order_matches_the_document(self):
+        listed = [anchor for _, anchor in self.entries]
+        in_text = [self._anchor(h) for h in self.headings if h != "Содержание"]
+        self.assertEqual(listed, in_text, "оглавление идёт не в том порядке, что разделы")
