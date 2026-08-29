@@ -278,10 +278,10 @@ def translate(observation: dict[str, Any]) -> Result:
 
     if dir_conf is None:
         confidence = dist_conf
-        scope = "относится только к расстоянию: направление не посчитано"
+        scope = "относится только к расстоянию — направление не посчитано"
     else:
         confidence = min(dist_conf, dir_conf)
-        scope = "относится к вектору целиком: и к расстоянию, и к направлению"
+        scope = "относится и к расстоянию, и к направлению"
     warnings = list(notes)
     if not observation.get("individual_calibration_known"):
         risk = model["individual_calibration_risk"]

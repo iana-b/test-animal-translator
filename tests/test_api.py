@@ -220,3 +220,35 @@ class TestOpenApiSchema(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)
+
+
+class TestModuleBoundaries(unittest.TestCase):
+    """Страницы и JSON — соседи над общим разбором, а не слои друг над другом."""
+
+    SRC = Path(__file__).resolve().parents[1] / "src" / "animal_translator"
+
+    def _imports(self, module: str) -> set[str]:
+        import ast
+
+        tree = ast.parse((self.SRC / f"{module}.py").read_text(encoding="utf-8"))
+        names: set[str] = set()
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ImportFrom) and node.level:
+                if node.module:
+                    names.add(node.module.split(".")[0])
+                names.update(alias.name for alias in node.names)
+        return names
+
+    def test_pages_do_not_call_the_json_api(self):
+        self.assertNotIn("api", self._imports("web"))
+
+    def test_json_layer_does_not_depend_on_markup(self):
+        self.assertNotIn("web", self._imports("api"))
+
+    def test_both_share_the_same_form_parsing(self):
+        for module in ("api", "web"):
+            with self.subTest(module):
+                self.assertIn("forms", self._imports(module))
+
+    def test_only_the_app_knows_about_both(self):
+        self.assertTrue({"api", "web"} <= self._imports("app"))

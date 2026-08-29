@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
-"""Пересборка раздела «Источники» в README из базы знаний.
+"""Пересборка изменяемых частей README.
 
-Список источников собирается из data/knowledge, поэтому README не может
-разойтись с тем, на чём работает приложение.
+Список источников собирается из data/knowledge, число тестов — из tests, поэтому
+README не может разойтись с тем, на чём работает приложение.
 
-    python3 scripts/build_readme.py
+    python3 scripts/build_readme.py           обновить
+    python3 scripts/build_readme.py --check   убедиться, что README не отстал
 """
 
 from __future__ import annotations
 
+import ast
 import json
+import re
 import sys
 from pathlib import Path
 
@@ -31,6 +34,34 @@ def access_ru(source: dict) -> str:
     if info["kind"] == "url":
         return f'открытый текст: [{info["note_ru"]}]({info["url"]})'
     return info["note_ru"]
+
+
+def count_tests() -> int:
+    """Число тест-методов во всех файлах tests/, без запуска unittest."""
+    total = 0
+    for path in sorted((ROOT / "tests").glob("test_*.py")):
+        tree = ast.parse(path.read_text(encoding="utf-8"))
+        for node in ast.walk(tree):
+            if isinstance(node, ast.ClassDef):
+                total += sum(1 for item in node.body
+                             if isinstance(item, ast.FunctionDef)
+                             and item.name.startswith("test_"))
+    return total
+
+
+def plural_tests(count: int) -> str:
+    """Согласование числительного: 1 тест, 2 теста, 5 тестов."""
+    last, tens = count % 10, count % 100
+    if last == 1 and tens != 11:
+        return "тест"
+    if 2 <= last <= 4 and not 12 <= tens <= 14:
+        return "теста"
+    return "тестов"
+
+
+def with_test_count(text: str) -> str:
+    count = count_tests()
+    return re.sub(r"\b\d+ тест[аов]*", f"{count} {plural_tests(count)}", text)
 
 
 def render() -> str:
@@ -59,14 +90,15 @@ def main() -> None:
     text = README.read_text(encoding="utf-8")
     before, rest = text.split(START, 1)
     _, after = rest.split(END, 1)
-    updated = f"{before}{START}\n\n{render()}\n{END}{after}"
+    updated = with_test_count(f"{before}{START}\n\n{render()}\n{END}{after}")
     if "--check" in sys.argv:
         if updated != text:
-            sys.exit("Раздел «Источники» в README устарел: запустите scripts/build_readme.py")
-        print("README соответствует базе знаний")
+            sys.exit("README устарел: запустите scripts/build_readme.py")
+        print("README соответствует базе знаний и тестам")
         return
     README.write_text(updated, encoding="utf-8")
-    print(f"Раздел «Источники» обновлён: {sum(1 for line in render().splitlines() if line.startswith('- **'))} записей")
+    sources = sum(1 for line in render().splitlines() if line.startswith("- **"))
+    print(f"Обновлено: источников {sources}, тестов {count_tests()}")
 
 
 if __name__ == "__main__":

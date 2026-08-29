@@ -81,10 +81,14 @@ footer a { color:var(--dim); }
 label { display:block; margin-bottom:20px; font-size:16.5px; }
 label span.q { display:block; margin-bottom:6px; font-weight:600; }
 label small { display:block; color:var(--dim); font-size:14.5px; margin-top:6px; line-height:1.5; }
-select, input[type=text] { width:100%; padding:11px 12px; border:1px solid var(--line);
+select, input { width:100%; padding:11px 12px; border:1px solid var(--line);
        background:var(--paper); color:var(--ink);
        font-family:inherit; font-size:17px; line-height:1.4; }
-select:focus, input[type=text]:focus { outline:2px solid var(--mark); outline-offset:-1px; }
+select:focus, input:focus { outline:2px solid var(--mark); outline-offset:-1px; }
+/* Числовое поле остаётся числовым, но выглядит как обычное: стрелки не нужны. */
+input[type=number] { -moz-appearance:textfield; appearance:textfield; }
+input[type=number]::-webkit-outer-spin-button,
+input[type=number]::-webkit-inner-spin-button { -webkit-appearance:none; margin:0; }
 ::placeholder { color:#9a9890; opacity:1; }
 button { padding:13px 26px; border:1px solid var(--mark); background:var(--mark); color:#fff;
          font-family:inherit; font-size:18px; cursor:pointer; }
@@ -198,10 +202,29 @@ def render_form(kb: dict[str, Any], values: dict[str, list[str]]) -> str:
         elif field["type"] == "choice":
             options = [("", "не указано")] + [(o["value"], o["label_ru"]) for o in field["options"]]
         else:
-            example = f' placeholder="{e(field["example_ru"])}"' if field.get("example_ru") else ""
+            attrs = [f'name="{e(field["id"])}"', f'value="{e(current)}"']
+            if field.get("example_ru"):
+                attrs.append(f'placeholder="{e(field["example_ru"])}"')
+
+            if field["type"] in ("number", "integer"):
+                # Числовое поле не принимает буквы и подсказывает диапазон.
+                attrs.append('type="number"')
+                attrs.append('inputmode="decimal"' if field["type"] == "number" else 'inputmode="numeric"')
+                for name in ("min", "max", "step"):
+                    if field.get(name) is not None:
+                        attrs.append(f'{name}="{e(field[name])}"')
+            elif field["type"] == "numbers":
+                # Список чисел через запятую: тип number тут не подходит, ограничиваем шаблоном.
+                attrs.append('type="text"')
+                attrs.append(r'pattern="[0-9.,;\s-]*"')
+                attrs.append('inputmode="decimal"')
+                attrs.append('title="Числа через запятую, например 0.12, 0.12, 0.35"')
+            else:
+                attrs.append('type="text"')
+
             rows.append(
                 f'<label><span class="q">{e(field["label_ru"])}{req}</span>'
-                f'<input type="text" name="{e(field["id"])}" value="{e(current)}"{example}>{hint}</label>'
+                f'<input {" ".join(attrs)}>{hint}</label>'
             )
             continue
 

@@ -133,7 +133,7 @@ class TestConfidenceScope(unittest.TestCase):
             {"dance_type": "waggle", "waggle_run_duration_s": 1.2,
              "angle_from_vertical_deg": 40, "sun_azimuth_deg": 180}
         )
-        self.assertIn("вектору целиком", res.confidence_scope_ru)
+        self.assertIn("и к расстоянию, и к направлению", res.confidence_scope_ru)
 
 
 if __name__ == "__main__":

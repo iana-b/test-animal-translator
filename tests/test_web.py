@@ -328,3 +328,74 @@ class TestMethodologyIsShown(unittest.TestCase):
                     import html as html_mod
 
                     self.assertIn(html_mod.escape(source["sample_ru"][:40]), html)
+
+
+class TestNumericInputs(unittest.TestCase):
+    """Числовое поле должно быть числовым: буквы туда ввести нельзя."""
+
+    def test_numeric_fields_render_as_number_inputs(self):
+        import re
+
+        for slug in SLUGS:
+            html = web.species_page(slug).decode("utf-8")
+            for field in load_species(slug)["input_schema"]:
+                if field["type"] not in ("number", "integer"):
+                    continue
+                tag = re.search(rf'<input [^>]*name="{field["id"]}"[^>]*>', html)
+                with self.subTest(slug=slug, field=field["id"]):
+                    self.assertIsNotNone(tag)
+                    self.assertIn('type="number"', tag.group(0))
+                    self.assertIn("inputmode=", tag.group(0))
+
+    def test_declared_bounds_reach_the_markup(self):
+        import re
+
+        for slug in SLUGS:
+            html = web.species_page(slug).decode("utf-8")
+            for field in load_species(slug)["input_schema"]:
+                tag = re.search(rf'<input [^>]*name="{field["id"]}"[^>]*>', html)
+                for name in ("min", "max", "step"):
+                    if field.get(name) is None or tag is None:
+                        continue
+                    with self.subTest(slug=slug, field=field["id"], attr=name):
+                        self.assertIn(f'{name}="{field[name]}"', tag.group(0))
+
+    def test_number_lists_restrict_input_by_pattern(self):
+        import re
+
+        for slug in SLUGS:
+            html = web.species_page(slug).decode("utf-8")
+            for field in load_species(slug)["input_schema"]:
+                if field["type"] != "numbers":
+                    continue
+                tag = re.search(rf'<input [^>]*name="{field["id"]}"[^>]*>', html)
+                with self.subTest(slug=slug, field=field["id"]):
+                    self.assertIn("pattern=", tag.group(0))
+
+    def test_bounds_do_not_exclude_the_examples(self):
+        """Пример значения обязан проходить по объявленным границам."""
+        for slug in SLUGS:
+            for field in load_species(slug)["input_schema"]:
+                example = field.get("example_ru")
+                if not example or field["type"] not in ("number", "integer"):
+                    continue
+                value = float(example.replace("например,", "").strip())
+                with self.subTest(slug=slug, field=field["id"]):
+                    if field.get("min") is not None:
+                        self.assertGreaterEqual(value, field["min"])
+                    if field.get("max") is not None:
+                        self.assertLessEqual(value, field["max"])
+
+
+class TestTermsAreExplained(unittest.TestCase):
+    """Термины вида объясняются там же, где встречаются впервые."""
+
+    def test_whale_terms_are_defined_in_the_form(self):
+        html = web.species_page("spermwhale").decode("utf-8")
+        for term in ("Кода —", "Орнаментация —", "Рубато —"):
+            with self.subTest(term):
+                self.assertIn(term, html)
+
+    def test_bee_waggle_phase_is_defined(self):
+        html = web.species_page("honeybee").decode("utf-8")
+        self.assertIn("Виляющая фаза —", html)

@@ -86,8 +86,8 @@ def _posterior(kb: dict[str, Any], candidates: list[str], obs: dict[str, Any]) -
         weight = kb["decision_rules"]["situation_prior_weight"]
         prior[reported] *= weight
         notes.append(
-            f"сообщённая ситуация «{next(c['label_ru'] for c in kb['contexts'] if c['id'] == reported)}» "
-            f"поднимает её априорный вес в {weight:.0f} раза"
+            f"обстановка «{next(c['label_ru'] for c in kb['contexts'] if c['id'] == reported)}» "
+            f"сделала эту версию втрое более ожидаемой ещё до разбора звука"
         )
 
     if obs.get("play_bow"):
@@ -298,7 +298,8 @@ def translate(observation: dict[str, Any]) -> Result:
         headline_ru=headline,
         confidence=confidence,
         confidence_level_ru=confidence_level_ru(confidence),
-        confidence_scope_ru="апостериорная вероятность верхнего контекста с поправкой на полноту ввода",
+        confidence_scope_ru="насколько вероятен именно этот контекст с учётом того, "
+                            "сколько полей заполнено",
         steps=steps,
         unknowns=unknowns,
         alternatives_ru=[f"{labels[c]} — {p:.0%}" for c, p in ranked[1:4]],

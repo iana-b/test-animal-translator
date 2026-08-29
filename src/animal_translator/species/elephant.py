@@ -125,7 +125,7 @@ def translate(observation: dict[str, Any]) -> Result:
         rate = playback["retreated"] / playback["of_trials"]
         control = playback["control_retreated"] / playback["control_of_trials"]
         confidence = rate
-        scope = "доля семей, ответивших предсказанной реакцией при проигрывании записи"
+        scope = "столько семей слонов ответили ожидаемым образом, когда им проиграли запись"
         steps.append(
             Step(
                 label_ru="Реакция на проигрывание",

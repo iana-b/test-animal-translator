@@ -65,7 +65,7 @@ class TestAlarmTypes(unittest.TestCase):
                                   "group_response": "retreat", "f0_hz": 18})
         playback = next(s["playback_response"] for s in KB["signals"] if s["id"] == "bee_alarm")
         self.assertAlmostEqual(res.confidence, playback["retreated"] / playback["of_trials"])
-        self.assertIn("проигрывании", res.confidence_scope_ru)
+        self.assertIn("проиграли запись", res.confidence_scope_ru)
 
     def test_playback_rate_is_not_labelled_on_the_plausibility_scale(self):
         """Доля отклика и правдоподобие трактовки — разные величины, шкала не общая."""
