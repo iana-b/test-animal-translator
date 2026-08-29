@@ -93,7 +93,7 @@ class InputFieldOut(BaseModel):
 
 
 class SpeciesSummary(BaseModel):
-    slug: str
+    slug: str = Field(description="Короткое имя вида в адресе, например dog")
     name_ru: str
     name_en: str | None = None
     scientific_name: str
@@ -103,7 +103,7 @@ class SpeciesSummary(BaseModel):
 
 
 class SpeciesDetail(BaseModel):
-    slug: str
+    slug: str = Field(description="Короткое имя вида в адресе, например dog")
     name_ru: str
     scientific_name: str
     engine: str
@@ -117,7 +117,7 @@ class SpeciesDetail(BaseModel):
 class TranslateRequest(BaseModel):
     """Наблюдение с типизированными значениями."""
 
-    species: str = Field(description="Слаг вида, например dog")
+    species: str = Field(description="Короткое имя вида в адресе: honeybee, dog, elephant или spermwhale. Полный список — в GET /api/species.")
     observation: dict[str, Any] = Field(
         default_factory=dict,
         description="Поля из input_schema вида. Незаполненные просто не передаются.")
@@ -137,7 +137,7 @@ class TranslateRequest(BaseModel):
 
 
 class TranslateResponse(BaseModel):
-    species: str
+    species: str = Field(description="Короткое имя вида в адресе, например dog")
     observation: dict[str, Any] = Field(description="Как приложение поняло ввод")
     fields_filled: int
     fields_total: int

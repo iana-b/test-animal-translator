@@ -130,9 +130,10 @@ def translate(observation: dict[str, Any]) -> Result:
             Step(
                 label_ru="Реакция на проигрывание",
                 value_ru=(
-                    f"{playback['retreated']} семей из {playback['of_trials']} ушли в ответ на запись "
-                    f"({rate:.0%}) против {playback['control_retreated']} из "
-                    f"{playback['control_of_trials']} на контроль ({control:.0%})."
+                    f"{playback['retreated']} семей из {playback['of_trials']} ушли, услышав запись "
+                    f"({rate:.0%}). На собственный спокойный рёв, записанный до опыта, ушли "
+                    f"{playback['control_retreated']} из {playback['control_of_trials']} "
+                    f"({control:.0%}) — значит, дело в самом сигнале."
                 ),
                 source_ids=[playback["source_id"]],
             )

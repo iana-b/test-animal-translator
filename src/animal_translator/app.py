@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from typing import Annotated, Any
 
-from fastapi import FastAPI, Query, Request
+from fastapi import FastAPI, Path, Query, Request
 from fastapi.responses import HTMLResponse, JSONResponse
 
 from . import api, web
@@ -29,6 +29,9 @@ DESCRIPTION = """
 
 Каждое число возводится к источнику, а там, где данных нет, приложение
 отказывается отвечать и объясняет, какого рода это незнание.
+
+Вид обозначается коротким именем в адресе — `honeybee`, `dog`, `elephant`,
+`spermwhale`. Полный список отдаёт `GET /api/species`.
 
 Схема наблюдения своя у каждого вида: она приходит в `GET /api/species/{slug}`
 полем `input_schema`, и поля запроса берутся оттуда.
@@ -69,14 +72,16 @@ def species_list() -> list[SpeciesSummary]:
 
 
 @app.get("/api/species/{slug}", tags=["Виды"], summary="Схема ввода, источники и мифы")
-def species_detail(slug: str) -> SpeciesDetail:
+def species_detail(
+    slug: Annotated[str, Path(description="Короткое имя вида в адресе, например dog")],
+) -> SpeciesDetail:
     return SpeciesDetail(**api.species_detail(slug))
 
 
 @app.get("/api/translate", tags=["Разбор"], summary="Разбор наблюдения (значения строками)")
 def translate_get(
     request: Request,
-    species: Annotated[str, Query(description="Слаг вида, например dog")],
+    species: Annotated[str, Query(description="Короткое имя вида в адресе: honeybee, dog, elephant или spermwhale. Полный список — в GET /api/species.")],
 ) -> TranslateResponse:
     values = {key: request.query_params.getlist(key)
               for key in request.query_params if key != "species"}
