@@ -151,7 +151,12 @@ class HealthResponse(BaseModel):
     species: int
 
 
-class ErrorResponse(BaseModel):
-    error: str
-    status: int
+class ErrorDetail(BaseModel):
+    message: str = Field(description="Что пошло не так")
     field: str | None = Field(default=None, description="Поле, из-за которого запрос не прошёл")
+
+
+class ErrorResponse(BaseModel):
+    """Единый вид ошибки: и у разбора, и у валидации тело лежит в detail."""
+
+    detail: ErrorDetail

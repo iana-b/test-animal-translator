@@ -186,3 +186,36 @@ class TestUncertaintyPropagation(unittest.TestCase):
         )
         step = next(s for s in res.steps if "омпасное" in s.label_ru)
         self.assertIn(f"{220 - err:.0f}–{220 + err:.0f}°", step.value_ru)
+
+
+class TestAchievableConfidence(unittest.TestCase):
+    """Верхняя граница уверенности названа в README; она должна совпадать с расчётом."""
+
+    def _best(self, with_direction: bool) -> float:
+        best = 0.0
+        for duration in (0.5, 0.6, 1.0, 1.2, 1.8, 2.1):
+            for runs in (1, 2, 4, 8):
+                for calibrated in (True, False):
+                    observation = {"dance_type": "waggle",
+                                   "waggle_run_duration_s": duration,
+                                   "n_waggle_runs_measured": runs,
+                                   "individual_calibration_known": calibrated}
+                    if with_direction:
+                        observation |= {"angle_from_vertical_deg": 40, "sun_azimuth_deg": 180}
+                    result = honeybee.translate(observation)
+                    if result.confidence:
+                        best = max(best, result.confidence)
+        return best
+
+    def test_distance_only_tops_out_at_the_model_fit(self):
+        r_squared = KB["quantitative_model"]["distance"]["r_squared"]
+        self.assertAlmostEqual(self._best(with_direction=False), r_squared, places=6)
+
+    def test_whole_vector_is_bounded_by_the_direction_corridor(self):
+        coverage = KB["confidence_model"]["factors"]["direction_confidence"]["value"]
+        self.assertAlmostEqual(self._best(with_direction=True), coverage, places=6)
+
+    def test_species_cap_never_binds(self):
+        """Потолок вида выше достижимого максимума, поэтому ограничивает R², а не он."""
+        self.assertGreater(KB["confidence_cap"],
+                           KB["quantitative_model"]["distance"]["r_squared"])

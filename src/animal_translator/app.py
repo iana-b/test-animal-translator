@@ -49,8 +49,8 @@ app = FastAPI(
 
 @app.exception_handler(api.ApiError)
 async def _api_error(request: Request, exc: api.ApiError) -> JSONResponse:
-    """Ошибки разбора отдаются той же структурой, что и на прямых вызовах."""
-    return JSONResponse(exc.as_dict(), status_code=exc.status)
+    """Ошибки разбора отдаются в том же виде, что и ошибки валидации FastAPI."""
+    return JSONResponse({"detail": exc.as_detail()}, status_code=exc.status)
 
 
 # --- JSON ---------------------------------------------------------------------

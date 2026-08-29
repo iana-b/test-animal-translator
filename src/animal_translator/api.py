@@ -27,11 +27,12 @@ class ApiError(Exception):
         self.message = message
         self.field = field
 
-    def as_dict(self) -> dict[str, Any]:
-        body: dict[str, Any] = {"error": self.message, "status": self.status}
+    def as_detail(self) -> dict[str, Any]:
+        """Соглашение FastAPI: тело ошибки лежит в поле detail."""
+        detail: dict[str, Any] = {"message": self.message}
         if self.field:
-            body["field"] = self.field
-        return body
+            detail["field"] = self.field
+        return detail
 
 
 def known_slugs() -> list[str]:

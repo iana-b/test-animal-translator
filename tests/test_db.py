@@ -23,7 +23,7 @@ KNOWLEDGE = {p.stem: json.loads(p.read_text(encoding="utf-8"))
 
 
 class DatabaseCase(unittest.TestCase):
-    """Каждый тест работает со своей базой во временном файле."""
+    """База собирается во временном файле, отдельно от рабочей."""
 
     @classmethod
     def setUpClass(cls):

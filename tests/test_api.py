@@ -140,15 +140,26 @@ class TestOverHttp(unittest.TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["result"]["verdict"], "translated")
 
-    def test_unknown_species_is_404_with_our_error_shape(self):
+    def test_unknown_species_is_404_in_the_standard_shape(self):
         response = client.get("/api/species/tiger")
         self.assertEqual(response.status_code, 404)
-        self.assertIn("error", response.json())
+        self.assertIn("message", response.json()["detail"])
 
     def test_unknown_field_is_400_and_names_the_field(self):
         response = client.get("/api/translate", params={"species": "dog", "pitchh": "low"})
         self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json()["field"], "pitchh")
+        self.assertEqual(response.json()["detail"]["field"], "pitchh")
+
+    def test_all_errors_share_one_shape(self):
+        """Ошибки разбора и ошибки валидации кладут тело в detail."""
+        for request in (lambda: client.get("/api/species/tiger"),
+                        lambda: client.get("/api/translate", params={"species": "dog",
+                                                                     "pitchh": "low"}),
+                        lambda: client.get("/api/translate")):
+            response = request()
+            with self.subTest(response.status_code):
+                self.assertGreaterEqual(response.status_code, 400)
+                self.assertIn("detail", response.json())
 
     def test_missing_species_is_422_by_framework_validation(self):
         response = client.get("/api/translate")
@@ -171,7 +182,7 @@ class TestOverHttp(unittest.TestCase):
 
 
 class TestOpenApiSchema(unittest.TestCase):
-    """Схема генерируется фреймворком, но должна описывать то, что мы обещаем."""
+    """Схема генерируется фреймворком; проверяется, что она описывает заявленное поведение."""
 
     @classmethod
     def setUpClass(cls):
