@@ -1,9 +1,7 @@
-"""Веб-интерфейс на стандартной библиотеке.
+"""Отрисовка страниц.
 
-Страницы:
-  /                      выбор вида
-  /species/<slug>        форма наблюдения и результат разбора
-  /species/<slug>/kb     база знаний вида: источники, методика, мифы
+Модуль занимается только разметкой: маршруты и запуск живут в app.py, а разбор —
+в species/. Возвращает готовые байты страницы.
 """
 
 from __future__ import annotations
@@ -11,9 +9,8 @@ from __future__ import annotations
 import html
 import importlib
 import json
-from http.server import BaseHTTPRequestHandler, HTTPServer
 from typing import Any
-from urllib.parse import parse_qs, urlparse
+from urllib.parse import urlparse
 
 from .forms import BOOL_CHOICES, FieldError, filled_count, parse_observation
 from .illustrations import accent, credit, credit_line, svg
@@ -132,6 +129,9 @@ table.m td.n { font-family:"SFMono-Regular",Menlo,Consolas,monospace; font-varia
 .kind { font-size:13.5px; color:var(--dim); }
 .myth b { color:var(--warn); }
 .err { border-left:4px solid var(--warn); padding-left:16px; font-size:17px; }
+pre { background:var(--wash); border:1px solid var(--edge); padding:14px 16px;
+      overflow-x:auto; font-size:15px; line-height:1.5; }
+pre code { background:none; }
 
 .cards { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:20px; }
 .card { display:block; text-decoration:none; color:inherit; background:var(--wash);
@@ -462,70 +462,18 @@ def _placeholder(kb: dict[str, Any]) -> str:
             f'<p><a href="/species/{kb["slug"]}/kb">База знаний, методика и мифы →</a></p></div>')
 
 
-class Handler(BaseHTTPRequestHandler):
-    server_version = "AnimalTranslator/1.0"
-
-    def log_message(self, *args):
-        """Отключает журнал запросов в консоли."""
-        pass
-
-    def _send(self, payload: bytes, status: int = 200) -> None:
-        self.send_response(status)
-        self.send_header("Content-Type", "text/html; charset=utf-8")
-        self.send_header("Content-Length", str(len(payload)))
-        self.end_headers()
-        self.wfile.write(payload)
-
-    def _route(self) -> tuple[str, str]:
-        parts = [p for p in urlparse(self.path).path.split("/") if p]
-        if not parts:
-            return "index", ""
-        if parts[0] == "species" and len(parts) >= 2:
-            return ("kb" if len(parts) > 2 and parts[2] == "kb" else "species"), parts[1]
-        return "404", ""
-
-    def do_GET(self) -> None:
-        route, slug = self._route()
-        known = {p.stem for p in KNOWLEDGE_DIR.glob("*.json")}
-        if route == "index":
-            return self._send(index_page())
-        if slug not in known:
-            return self._send(page("Не найдено", '<div class="panel">Такой страницы нет.</div>'), 404)
-        if route == "kb":
-            return self._send(knowledge_page(load_species(slug)))
-
-        # Разбор доступен и по GET, поэтому у результата есть собственный адрес.
-        values = parse_qs(urlparse(self.path).query, keep_blank_values=True)
-        if any(v and v[0] for v in values.values()):
-            return self._send(self._render_species(slug, values))
-        return self._send(species_page(slug))
-
-    def _render_species(self, slug: str, values: dict[str, list[str]]) -> bytes:
-        kb = load_species(slug)
-        try:
-            observation = parse_observation(kb["input_schema"], values)
-        except FieldError as exc:
-            return species_page(
-                slug, values,
-                f'<div class="panel"><h2>Ввод не разобран</h2><div class="err">{e(exc)}</div></div>')
-        result = _engine(slug).translate(observation)
-        return species_page(slug, values, render_result(kb, result, observation))
-
-    def do_POST(self) -> None:
-        route, slug = self._route()
-        known = {p.stem for p in KNOWLEDGE_DIR.glob("*.json")}
-        if route != "species" or slug not in known:
-            return self._send(page("Не найдено", '<div class="panel">Такой страницы нет.</div>'), 404)
-
-        length = int(self.headers.get("Content-Length") or 0)
-        values = parse_qs(self.rfile.read(length).decode("utf-8"), keep_blank_values=True)
-        return self._send(self._render_species(slug, values))
+def not_found_page() -> bytes:
+    return page("Не найдено", '<div class="panel">Такой страницы нет.</div>')
 
 
-def serve(port: int = 8000, host: str = "127.0.0.1") -> None:
-    httpd = HTTPServer((host, port), Handler)
-    print(f"Открой http://127.0.0.1:{port}  (Ctrl+C — остановить)")
+def render_species(slug: str, values: dict[str, list[str]]) -> bytes:
+    """Страница вида с результатом разбора присланного наблюдения."""
+    kb = load_species(slug)
     try:
-        httpd.serve_forever()
-    except KeyboardInterrupt:
-        print("\nОстановлено.")
+        observation = parse_observation(kb["input_schema"], values)
+    except FieldError as exc:
+        return species_page(
+            slug, values,
+            f'<div class="panel"><h2>Ввод не разобран</h2><div class="err">{e(exc)}</div></div>')
+    result = _engine(slug).translate(observation)
+    return species_page(slug, values, render_result(kb, result, observation))

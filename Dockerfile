@@ -1,8 +1,13 @@
 FROM python:3.12-slim
 
 WORKDIR /app
+
+COPY pyproject.toml ./
 COPY src/ ./src/
-COPY data/ ./data/
+RUN pip install --no-cache-dir .
+
+COPY data/knowledge/ ./data/knowledge/
+COPY data/illustrations/ ./data/illustrations/
 COPY run.py ./
 
 ENV HOST=0.0.0.0

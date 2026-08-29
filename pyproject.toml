@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "animal-translator"
+version = "1.0.0"
+description = "Разбор сигналов животных по опубликованным исследованиям"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115",
+    "uvicorn[standard]>=0.34",
+]
+
+[project.optional-dependencies]
+dev = [
+    # TestClient из FastAPI работает поверх HTTP-клиента
+    "httpx>=0.28",
+]
+
+[project.scripts]
+animal-translator = "animal_translator.app:serve"
+
+[tool.setuptools.packages.find]
+where = ["src"]

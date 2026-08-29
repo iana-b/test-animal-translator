@@ -16,6 +16,8 @@
 ## Содержание
 
 - [Как запустить](#как-запустить)
+- [API](#api)
+- [Запросы к базе](#запросы-к-базе)
 - [Что внутри](#что-внутри)
 - [Виды и почему логика разная](#виды-и-почему-логика-разная)
 - [Как устроена база знаний](#как-устроена-база-знаний)
@@ -32,14 +34,15 @@
 
 ## Как запустить
 
-Внешних зависимостей нет: нужен только Python 3.12.
+Нужен Python 3.12.
 
 ```bash
+pip install -e ".[dev]"
 python3 run.py
 ```
 
-Приложение откроется на `http://127.0.0.1:8000`. Порт можно задать аргументом:
-`python3 run.py 8765`.
+Приложение откроется на `http://127.0.0.1:8000`, документация API — на
+`http://127.0.0.1:8000/docs`. Порт задаётся аргументом: `python3 run.py 8765`.
 
 Через Docker:
 
@@ -53,6 +56,154 @@ docker run -p 8000:8000 animal-translator
 ```bash
 python3 -m unittest discover -s tests
 ```
+
+---
+
+## API
+
+Приложение построено на **FastAPI**: те же движки, что и у страниц, отдаются как
+JSON. Интерактивная документация и схема генерируются из моделей и доступны сразу.
+
+| Адрес | Что там |
+|---|---|
+| `/docs` | Swagger UI: описание с кнопкой «попробовать» |
+| `/redoc` | То же описание в виде справочника |
+| `/openapi.json` | Схема OpenAPI 3.1 |
+
+| Метод и путь | Что делает |
+|---|---|
+| `GET /api/health` | Health check: статус, версия, число видов |
+| `GET /api/species` | Список видов с движками |
+| `GET /api/species/{slug}` | Схема ввода, источники и мифы вида |
+| `GET /api/translate?species=…&<поля>` | Разбор, значения строками |
+| `POST /api/translate` | То же, значения своих типов |
+
+Схема наблюдения приходит в `GET /api/species/{slug}` полем `input_schema`, и поля
+запроса берутся оттуда: у каждого вида они свои.
+
+```bash
+curl "http://127.0.0.1:8000/api/translate?species=dog&signal_type=bark\
+&pitch=low&repetition=fast&tonality=atonal&reported_situation=stranger"
+```
+
+```json
+{
+  "species": "dog",
+  "fields_filled": 5,
+  "fields_total": 7,
+  "result": {
+    "verdict": "translated",
+    "headline_ru": "Вероятнее всего: появился чужой.",
+    "confidence": 0.465,
+    "confidence_scope_ru": "апостериорная вероятность верхнего контекста с поправкой на полноту ввода",
+    "unknowns": [],
+    "alternatives_ru": ["Агрессивная схватка — 18%", "..."],
+    "source_ids": ["pongracz2006", "molnar2008"]
+  },
+  "sources": [{"id": "pongracz2006", "doi": "10.1016/j.applanim.2005.12.004", "...": "..."}]
+}
+```
+
+Через POST значения передаются своими типами, включая списки чисел:
+
+```bash
+curl -X POST http://127.0.0.1:8000/api/translate \
+  -H "Content-Type: application/json" \
+  -d '{"species":"spermwhale","observation":{"signal_type":"coda",
+       "inter_click_intervals_s":[0.12,0.12,0.35,0.12],"extra_final_click":true}}'
+```
+
+Ошибки разбора приходят своей структурой и называют поле, из-за которого запрос не
+прошёл; ошибки валидации самого запроса обрабатывает FastAPI и возвращает `422`.
+
+```json
+{"error": "Неизвестные поля для вида 'dog': pitchh", "status": 400, "field": "pitchh"}
+```
+
+Четыре типа неопределённости перечислены прямо в схеме, поэтому клиент может на них
+опираться: `data_gap`, `not_encoded`, `not_applicable`, `beyond_model`.
+
+---
+
+## Запросы к базе
+
+JSON остаётся источником правды: он читается глазами, виден в диффах и не требует
+установки. Но для вопросов поперёк видов файлы неудобны, поэтому из них собирается
+SQLite — производная запрашиваемая форма.
+
+```bash
+python3 scripts/build_db.py          # собрать data/knowledge.db
+python3 scripts/build_db.py --demo   # собрать и выполнить примеры запросов
+python3 scripts/build_db.py --check  # убедиться, что база не отстала от JSON
+```
+
+Модуль `sqlite3` входит в стандартную библиотеку, поэтому зависимостей не
+прибавляется. Файл базы не хранится в репозитории: это собираемый артефакт.
+
+### Схема
+
+Девять таблиц с внешними ключами, ограничениями и индексами:
+
+| Таблица | Что хранит |
+|---|---|
+| `species` | Виды и их движки |
+| `sources` | Библиография: DOI, лицензия, доказательность, статус доступа, поправки |
+| `myths` + `myth_sources` | Мифы и связь с источниками, многие-ко-многим |
+| `input_fields` + `input_options` | Схема формы с сохранением порядка полей |
+| `contexts` | Контексты лая с размерами выборок |
+| `context_reliability` | Доля распознавания, каппа, значимость |
+| `confusion` | Матрица путаницы: истинный контекст → принятый за него |
+| `meta` | Время сборки и отпечаток исходных файлов |
+
+Отпечаток в `meta` позволяет обнаружить рассинхронизацию: `--check` сравнивает его
+с текущим состоянием `data/knowledge` и сообщает, если база отстала.
+
+### Примеры запросов
+
+Контексты, которые по звуку не отличаются от случайных:
+
+```sql
+SELECT c.label_ru, r.recall, r.kappa, r.p_ru
+  FROM context_reliability r
+  JOIN contexts c ON c.species_slug = r.species_slug
+                 AND c.context_id  = r.context_id
+ WHERE r.better_than_random = 0
+ ORDER BY r.recall DESC;
+```
+
+```
+Сборы на прогулку  0.3   0.14   t10 = 0.43, P = 0.67
+Оставлена одна     0.15  0.04   t4 = 0.06,  P = 0.95
+Игра с человеком   0.06  -0.06  t5 = 1.63,  P = 0.16
+```
+
+С чем чаще всего путают каждый контекст:
+
+```sql
+SELECT t.label_ru AS истинный, p.label_ru AS принят_за, f.share
+  FROM confusion f
+  JOIN contexts t ON t.species_slug = f.species_slug AND t.context_id = f.true_context
+  JOIN contexts p ON p.species_slug = f.species_slug AND p.context_id = f.predicted_context
+ WHERE f.true_context <> f.predicted_context
+   AND f.share = (SELECT MAX(share) FROM confusion x
+                   WHERE x.species_slug = f.species_slug
+                     AND x.true_context = f.true_context
+                     AND x.predicted_context <> x.true_context)
+ ORDER BY f.share DESC;
+```
+
+```
+Оставлена одна       → Появился чужой       0.43
+Игра с человеком     → Сборы на прогулку    0.40
+Просит мяч           → Появился чужой       0.38
+Сборы на прогулку    → Появился чужой       0.30
+```
+
+Видно, что «появился чужой» работает воронкой: в него стекаются ошибки почти со
+всех остальных контекстов. По отдельным строкам матрицы это не заметно.
+
+Ещё пять готовых запросов — в `scripts/build_db.py`, все выполняются командой
+`--demo` и покрыты тестами.
 
 ---
 
@@ -96,6 +247,10 @@ python3 -m unittest discover -s tests
 
 ![База знаний](docs/screenshots/09-knowledge.png)
 
+Документация API генерируется из моделей Pydantic:
+
+![Swagger UI](docs/screenshots/10-api-docs.png)
+
 Скриншоты пересобираются одной командой: `python3 scripts/screenshots.py`.
 
 ---
@@ -109,10 +264,15 @@ src/animal_translator/
   knowledge.py            загрузка базы
   result.py               общий формат ответа для всех видов
   forms.py                разбор присланных значений формы
-  web.py                  веб-интерфейс на стандартной библиотеке
+  app.py                  приложение FastAPI: маршруты и отдача HTML
+  schemas.py              модели Pydantic, из них собирается схема OpenAPI
+  api.py                  разбор в виде данных, без знания о HTTP
+  web.py                  отрисовка страниц
   illustrations.py        пиктограммы и цветовые акценты
   species/*.py            движки разбора, по одному на вид
-tests/                    128 тестов
+tests/                    173 тестов
+pyproject.toml            зависимости и требование Python 3.12
+scripts/build_db.py       сборка SQLite из базы знаний
 scripts/screenshots.py    пересборка скриншотов
 ```
 
@@ -282,7 +442,7 @@ elements, and not the semantics, of the sperm whale communication system»*.
 python3 -m unittest discover -s tests
 ```
 
-128 тестов. Проверяются не только ветвления кода, но и содержание базы: что
+173 тестов. Проверяются не только ветвления кода, но и содержание базы: что
 величины совпадают с опубликованными, что диагональ матрицы путаницы совпадает с
 долями распознавания, записанными отдельно, что каждый источник используется и
 каждый коэффициент объявляет происхождение.
