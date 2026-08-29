@@ -33,15 +33,15 @@ SHOTS = [
      "Выбор вида"),
     ("02-bee-full", "/species/honeybee?dance_type=waggle&waggle_run_duration_s=1.2"
                     "&n_waggle_runs_measured=4&angle_from_vertical_deg=40"
-                    "&sun_azimuth_deg=180&individual_calibration_known=yes", 1280, 1250,
+                    "&sun_azimuth_deg=180&individual_calibration_known=yes", 1280, 1700,
      "Пчела: расстояние и направление посчитаны, уверенность 85%"),
-    ("03-bee-gap", "/species/honeybee?dance_type=waggle&waggle_run_duration_s=0.6", 1280, 1150,
+    ("03-bee-gap", "/species/honeybee?dance_type=waggle&waggle_run_duration_s=0.6", 1280, 1500,
      "Пчела: угол не измерен — направление помечено как пробел в наблюдении"),
     ("04-dog-refusal", "/species/dog?signal_type=bark&pitch=low&repetition=fast"
                        "&tonality=atonal", 1280, 1350,
      "Собака: по одному звуку контекст не определяется, показано всё распределение"),
     ("05-dog-context", "/species/dog?signal_type=bark&pitch=low&repetition=fast"
-                       "&tonality=atonal&reported_situation=stranger", 1280, 1350,
+                       "&tonality=atonal&reported_situation=stranger", 1280, 1600,
      "Собака: обстановка сузила распределение до 47%"),
     ("06-elephant", "/species/elephant?perceived=heard&f0_hz=18&headshaking=yes"
                     "&threat_present=bees&group_response=retreat", 1280, 1250,
