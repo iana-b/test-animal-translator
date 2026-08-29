@@ -9,10 +9,12 @@
 
 from __future__ import annotations
 
+import importlib.util
 import shutil
 import socket
 import subprocess
 import sys
+import tempfile
 import time
 from pathlib import Path
 from urllib.request import urlopen
@@ -57,6 +59,15 @@ SHOTS = [
 ]
 
 
+def check_environment() -> None:
+    """Подпроцесс поднимается тем же интерпретатором, поэтому зависимости нужны здесь."""
+    if importlib.util.find_spec("fastapi") is None:
+        sys.exit(
+            f"FastAPI не найден для {sys.executable}.\n"
+            "Активируйте окружение (source .venv/bin/activate) "
+            "или запустите скрипт как .venv/bin/python scripts/screenshots.py")
+
+
 def find_chrome() -> str:
     for candidate in CHROME_CANDIDATES:
         if Path(candidate).exists() or shutil.which(candidate):
@@ -77,34 +88,44 @@ def wait_for(url: str, attempts: int = 40) -> None:
             return
         except OSError:
             time.sleep(0.25)
-    sys.exit(f"Приложение не поднялось на {url}")
+    sys.exit(f"Приложение не поднялось на {url}. "
+             "Проверьте, что порт свободен и приложение запускается: python3 run.py")
 
 
 def main() -> None:
+    check_environment()
     chrome = find_chrome()
     port = free_port()
-    OUT.mkdir(parents=True, exist_ok=True)
 
-    for stale in OUT.glob("*.png"):
-        stale.unlink()
+    # Съёмка идёт во временную папку: неудачный прогон не должен трогать
+    # уже готовые скриншоты.
+    with tempfile.TemporaryDirectory() as staging_name:
+        staging = Path(staging_name)
+        server = subprocess.Popen([sys.executable, str(ROOT / "run.py"), str(port)],
+                                  stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
+        try:
+            base = f"http://127.0.0.1:{port}"
+            wait_for(base + "/")
+            for name, path, width, height, caption in SHOTS:
+                target = staging / f"{name}.png"
+                subprocess.run(
+                    [chrome, "--headless", "--disable-gpu", "--hide-scrollbars",
+                     f"--window-size={width},{height}",
+                     f"--screenshot={target}", base + path],
+                    stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
+                if not target.exists() or target.stat().st_size == 0:
+                    sys.exit(f"Не удалось снять {name}: {base}{path}")
+                print(f"  {target.name:20s} {target.stat().st_size // 1024:4d} КБ  {caption}")
+        finally:
+            server.terminate()
+            server.wait(timeout=5)
 
-    server = subprocess.Popen([sys.executable, str(ROOT / "run.py"), str(port)],
-                              stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
-    try:
-        base = f"http://127.0.0.1:{port}"
-        wait_for(base + "/")
-        for name, path, width, height, caption in SHOTS:
-            target = OUT / f"{name}.png"
-            subprocess.run(
-                [chrome, "--headless", "--disable-gpu", "--hide-scrollbars",
-                 f"--window-size={width},{height}",
-                 f"--screenshot={target}", base + path],
-                stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, check=True)
-            size = target.stat().st_size // 1024
-            print(f"  {target.name:20s} {size:4d} КБ  {caption}")
-    finally:
-        server.terminate()
-        server.wait(timeout=5)
+        # Заменяем набор целиком только после того, как все кадры сняты.
+        OUT.mkdir(parents=True, exist_ok=True)
+        for stale in OUT.glob("*.png"):
+            stale.unlink()
+        for shot in sorted(staging.glob("*.png")):
+            shutil.copy2(shot, OUT / shot.name)
 
 
 if __name__ == "__main__":
